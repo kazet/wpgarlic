@@ -1,0 +1,8 @@
+/contact-form-7/v1@0
+/contact-form-7/v1/contact-forms@0
+/contact-form-7/v1/contact-forms@1
+/contact-form-7/v1/contact-forms/(?P<id>\d+)@0
+/contact-form-7/v1/contact-forms/(?P<id>\d+)@1
+/contact-form-7/v1/contact-forms/(?P<id>\d+)@2
+/contact-form-7/v1/contact-forms/(?P<id>\d+)/feedback@0
+/contact-form-7/v1/contact-forms/(?P<id>\d+)/refill@0

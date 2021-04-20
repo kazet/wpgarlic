@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+if [ ! -e venv ]; then
+    python3 -m venv venv
+fi
+
+. venv/bin/activate
+
+pip install --quiet -r requirements.txt

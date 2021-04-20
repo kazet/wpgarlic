@@ -1,0 +1,7 @@
+black==22.1.0
+flake8==4.0.1
+isort==5.10.1
+requests==2.27.1
+termcolor==1.1.0
+tqdm==4.62.3
+typer==0.4.0

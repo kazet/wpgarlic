@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+
+if [ -z $1 ]; then
+    echo "Usage: $0 plugin"
+    exit 1
+fi
+
+docker-compose -f docker-compose.manual-testing.yml stop
+docker-compose -f docker-compose.manual-testing.yml rm -f
+docker-compose -f docker-compose.manual-testing.yml build
+docker-compose -f docker-compose.manual-testing.yml up -d
+docker-compose -f docker-compose.manual-testing.yml exec wordpress2 bash -c \
+    "/wait-for-it/wait-for-it.sh db2:3306 --timeout=100 -- mysql --host=db2 -u wordpress --password=wordpress wordpress < /fuzzer/dump.sql"
+docker-compose -f docker-compose.manual-testing.yml exec wordpress2 bash -c \
+    "php.orig /wp-cli.phar --allow-root plugin install --activate $1 < /dev/null"
+docker-compose -f docker-compose.manual-testing.yml exec wordpress2 bash

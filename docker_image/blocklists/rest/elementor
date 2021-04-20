@@ -1,0 +1,14 @@
+/elementor/v1@0
+/elementor/v1/globals@0
+/elementor/v1/globals/colors@0
+/elementor/v1/globals/colors/(?P<id>[\w]+)@0
+/elementor/v1/globals/colors/(?P<id>[\w]+)@1
+/elementor/v1/globals/colors/(?P<id>[\w]+)@2
+/elementor/v1/globals/typography@0
+/elementor/v1/globals/typography/(?P<id>[\w]+)@0
+/elementor/v1/globals/typography/(?P<id>[\w]+)@1
+/elementor/v1/globals/typography/(?P<id>[\w]+)@2
+/elementor/v1/favorites@0
+/elementor/v1/favorites/(?P<id>[\w]+)@0
+/elementor/v1/favorites/(?P<id>[\w]+)@1
+/elementor/v1/template-library/templates@0

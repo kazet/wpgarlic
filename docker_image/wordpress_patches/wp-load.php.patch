@@ -1,0 +1,18 @@
+*** wp-load.php.orig	Sat May 15 17:38:05 2021
+--- wp-load.php	Sat Nov 27 15:45:35 2021
+***************
+*** 59,71 ****
+  	// A config file doesn't exist.
+  
+  	define( 'WPINC', 'wp-includes' );
+  	require_once ABSPATH . WPINC . '/load.php';
+  
+- 	// Standardize $_SERVER variables across setups.
+- 	wp_fix_server_vars();
+- 
+  	require_once ABSPATH . WPINC . '/functions.php';
+  
+  	$path = wp_guess_url() . '/wp-admin/setup-config.php';
+  
+  	/*
+--- 59,68 ----

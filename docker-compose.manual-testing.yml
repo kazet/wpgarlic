@@ -1,0 +1,23 @@
+version: "3.9"
+    
+services:
+  wordpress2:
+    depends_on:
+      - db2
+    build: docker_image/
+    ports:
+      - "8001:8001"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db2:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+  db2:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress

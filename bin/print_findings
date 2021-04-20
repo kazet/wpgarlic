@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+. ./bin/create_and_enter_venv
+
+python print_findings.py $@
