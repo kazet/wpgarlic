@@ -3,6 +3,8 @@ import subprocess
 import time
 import typing
 
+from os.path import basename
+
 
 def run_in_container(cmd: typing.List[str]) -> None:
     subprocess.call(
@@ -25,6 +27,36 @@ def run_in_container_and_get_output(cmd: typing.List[str]) -> bytes:
             "wordpress1",
         ]
         + cmd
+    )
+
+
+def copy_plugin_into_container(file_path: str) -> str:
+    file_name = basename(file_path)
+    new_file_path = f'/fuzzer/plugin_{file_name}'
+    subprocess.call(
+        [
+            "docker",
+            "cp",
+            file_path,
+            f"wordpress1:{new_file_path}"
+        ]
+    )
+    return new_file_path
+
+
+def install_plugin_from_file(file_path: str) -> None:
+    new_file_path = copy_plugin_into_container(file_path)
+    run_in_container(
+        [
+            "/fuzzer/nodebug.sh",
+            "php.orig",
+            "/wp-cli.phar",
+            "--allow-root",
+            "--activate",
+            "plugin",
+            "install",
+            new_file_path
+        ]
     )
 
 

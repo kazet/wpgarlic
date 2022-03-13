@@ -2,6 +2,7 @@ version: "3.9"
     
 services:
   wordpress2:
+    container_name: wordpress2
     depends_on:
       - db2
     build: docker_image/

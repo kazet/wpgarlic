@@ -21,6 +21,7 @@ from fuzzer_container import (
     fuzz_pages,
     fuzz_rest_routes,
     install_plugin_from_svn,
+    install_plugin_from_file,
     reinitialize_containers,
 )
 
@@ -70,16 +71,22 @@ def fuzz_plugin(
     else:
         enabled_features = enabled_features.split(",")
 
-    assert all(
-        [letter in string.ascii_letters + string.digits + "-_" for letter in slug]
-    )
+    if slug.endswith('.zip') and os.path.exists(slug):
+        plugin_path = slug
+        slug = os.path.basename(slug)
+        plugin_info_dict = {'version': 0, 'active_installs': 0, 'sections': {'description': ''}, 'from_file': True}
+    else:
+        assert all(
+            [letter in string.ascii_letters + string.digits + "-_" for letter in slug]
+        )
 
-    plugin_info_dict = None
-    print("Looking for", slug)
-    plugin_info_dict = requests.get(
-        f"https://api.wordpress.org/plugins/info/1.2/?action=plugin_information"
-        f"&request[slug]={slug}"
-    ).json()
+        plugin_info_dict = None
+        print("Looking for", slug)
+        plugin_info_dict = requests.get(
+            f"https://api.wordpress.org/plugins/info/1.2/?action=plugin_information"
+            f"&request[slug]={slug}"
+        ).json()
+        plugin_info_dict['from_file'] = False
 
     if version is None:
         version = plugin_info_dict["version"]
@@ -92,8 +99,45 @@ def fuzz_plugin(
         reinitialize_containers()
 
         try:
-            if install_dependencies:
-                for dependency in dependencies:
+            if plugin_info_dict['from_file']:
+                install_plugin_from_file(plugin_path)
+                activation_problem = None
+            else:
+                if install_dependencies:
+                    for dependency in dependencies:
+                        subprocess.call(
+                            [
+                                "docker-compose",
+                                "exec",
+                                "wordpress1",
+                                "/fuzzer/nodebug.sh",
+                                "php.orig",
+                                "/wp-cli.phar",
+                                "--allow-root",
+                                "plugin",
+                                "install",
+                                "--activate",
+                                dependency,
+                            ]
+                        )
+                        # This is to execute plugin hooks in case it needs to do something
+                        # on the first admin visit
+                        subprocess.call(
+                            [
+                                "docker-compose",
+                                "exec",
+                                "wordpress1",
+                                "/fuzzer/just_visit_admin_homepage.sh",
+                            ]
+                        )
+
+                if revision:
+                    install_plugin_from_svn(slug, revision)
+                else:
+                    if version:
+                        additional_install_options = ["--version=" + version]
+                    else:
+                        additional_install_options = []
                     subprocess.call(
                         [
                             "docker-compose",
@@ -105,62 +149,29 @@ def fuzz_plugin(
                             "--allow-root",
                             "plugin",
                             "install",
-                            "--activate",
-                            dependency,
+                            slug,
                         ]
+                        + additional_install_options
                     )
-                    # This is to execute plugin hooks in case it needs to do something
-                    # on the first admin visit
+
+                try:
                     subprocess.call(
                         [
                             "docker-compose",
                             "exec",
                             "wordpress1",
-                            "/fuzzer/just_visit_admin_homepage.sh",
+                            "/fuzzer/nodebug.sh",
+                            "php.orig",
+                            "/wp-cli.phar",
+                            "--allow-root",
+                            "plugin",
+                            "activate",
+                            slug,
                         ]
                     )
-
-            if revision:
-                install_plugin_from_svn(slug, revision)
-            else:
-                if version:
-                    additional_install_options = ["--version=" + version]
-                else:
-                    additional_install_options = []
-                subprocess.call(
-                    [
-                        "docker-compose",
-                        "exec",
-                        "wordpress1",
-                        "/fuzzer/nodebug.sh",
-                        "php.orig",
-                        "/wp-cli.phar",
-                        "--allow-root",
-                        "plugin",
-                        "install",
-                        slug,
-                    ]
-                    + additional_install_options
-                )
-
-            try:
-                subprocess.call(
-                    [
-                        "docker-compose",
-                        "exec",
-                        "wordpress1",
-                        "/fuzzer/nodebug.sh",
-                        "php.orig",
-                        "/wp-cli.phar",
-                        "--allow-root",
-                        "plugin",
-                        "activate",
-                        slug,
-                    ]
-                )
-                activation_problem = None
-            except Exception as e:
-                activation_problem = repr(e)
+                    activation_problem = None
+                except Exception as e:
+                    activation_problem = repr(e)
 
             subprocess.call(
                 [
@@ -293,7 +304,6 @@ def fuzz_plugin(
                 "active_installs": active_installs,
                 "error": repr(e),
             }
-
         random_token = binascii.hexlify(os.urandom(16)).decode("ascii")
         with open(
             os.path.join(output_path, f"{slug}_{random_token}.json"),
