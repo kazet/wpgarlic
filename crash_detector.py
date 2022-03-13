@@ -4,7 +4,7 @@ import typing
 
 def get_matchers(
     in_admin: bool,
-) -> typing.List[re.Pattern]:
+) -> typing.List["re.Pattern"]:
     flags = re.DOTALL | re.IGNORECASE
     matchers = [
         re.compile("fopen\\(.{0,256}GARLIC", flags),
