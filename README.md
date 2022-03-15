@@ -1,7 +1,7 @@
 # wpgarlic
 A proof-of-concept WordPress plugin fuzzer used in the research described in
 https://kazet.cc/2022/02/03/fuzzing-wordpress-plugins.html that helped to discover
-more than 120 vulnerablities in WordPress plugins installed on more than 10 million
+more than 140 vulnerablities in WordPress plugins installed on almost 15 million
 sites.
 
 If you want to continue the research, start with less popular plugins - if a plugin
@@ -171,7 +171,7 @@ to change that.
 Maybe. Install the plugin in a local test environment (for example you may use the one described in
 the *Manual testing environment* section) and analyze the bug.
 
-### Fuzzer found nothing, is a plugin secure?
+### Fuzzer found nothing, is the plugin secure?
 **Don't assume that.** The fuzzer finds some classes of vulnerabilities, but has its limitations.
 
 Fuzzer founds nothing for most of the plugins - the purpose of the tool is rather to massively
