@@ -3,7 +3,7 @@
 set -e
 
 if [ -z $1 ]; then
-    echo "Usage: $0 plugin [version]"
+    echo "Usage: $0 plugin_slug|plugin.zip [version]"
     exit 1
 fi
 

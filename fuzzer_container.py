@@ -4,9 +4,9 @@ import time
 import typing
 
 from os.path import basename
+from zipfile import ZipFile
 
-
-def run_in_container(cmd: typing.List[str]) -> None:
+def _run_in_container(cmd: typing.List[str]) -> None:
     subprocess.call(
         [
             "docker-compose",
@@ -18,7 +18,17 @@ def run_in_container(cmd: typing.List[str]) -> None:
     )
 
 
-def run_in_container_and_get_output(cmd: typing.List[str]) -> bytes:
+def _run_in_container_wp_cli(cmd: typing.List[str]) -> None:
+    _run_in_container(
+        [
+            "/fuzzer/nodebug.sh",
+            "php.orig",
+            "/wp-cli.phar",
+            "--allow-root",
+        ] + cmd)
+
+
+def _run_in_container_and_get_output(cmd: typing.List[str]) -> bytes:
     return subprocess.check_output(
         [
             "docker-compose",
@@ -30,7 +40,7 @@ def run_in_container_and_get_output(cmd: typing.List[str]) -> bytes:
     )
 
 
-def copy_plugin_into_container(file_path: str) -> str:
+def _copy_plugin_into_container(file_path: str) -> str:
     file_name = basename(file_path)
     new_file_path = f'/fuzzer/plugin_{file_name}'
     subprocess.call(
@@ -44,20 +54,106 @@ def copy_plugin_into_container(file_path: str) -> str:
     return new_file_path
 
 
-def install_plugin_from_file(file_path: str) -> None:
-    new_file_path = copy_plugin_into_container(file_path)
-    run_in_container(
+def get_plugin_name_from_file(file_path: str) -> str:
+    with ZipFile(file_path) as zip_file:
+        for listed in zip_file.namelist():
+            if listed[-1] != '/':
+                continue
+            return listed[:-1]
+    return ''
+
+
+def install_dependency(dependency: str) -> None:
+    install_plugin_from_slug(dependency)
+
+def install_plugin_from_slug(slug: str, version: str = None):
+    if version:
+        additional_install_options = ["--version=" + version]
+    else:
+        additional_install_options = []
+    _run_in_container_wp_cli(
         [
-            "/fuzzer/nodebug.sh",
-            "php.orig",
-            "/wp-cli.phar",
-            "--allow-root",
-            "--activate",
             "plugin",
             "install",
+            slug,
+        ]
+        + additional_install_options
+    )
+
+def install_plugin_from_file(file_path: str) -> None:
+    new_file_path = _copy_plugin_into_container(file_path)
+    _run_in_container_wp_cli(
+        [
+            'plugin',
+            'install',
             new_file_path
+        ])
+
+def activate_plugin(slug: str) -> None:
+    _run_in_container_wp_cli(
+        [
+            "plugin",
+            "activate",
+            slug,
         ]
     )
+
+def set_webroot_ownership() -> None:
+    _run_in_container(
+        [
+            "chown",
+            "-R",
+            "www-data:www-data",
+            "/var/www/html/",
+        ]
+    )
+
+def patch_wordpress(reverse: bool = False) -> None:
+    additional_parameters = []
+    if reverse:
+        additional_parameters = ['--reverse']
+
+    _run_in_container(["/fuzzer/patch_wordpress.sh"] + additional_parameters)
+    # subprocess.call(
+    #     ["docker-compose", "exec", "wordpress1", "/fuzzer/patch_wordpress.sh"] + additional_parameters
+    # )
+
+def patch_plugins(reverse: bool = False) -> None:
+    additional_parameters = []
+    if reverse:
+        additional_parameters = ['--reverse']
+
+    _run_in_container(["/fuzzer/patch_plugins.sh"] + additional_parameters)
+    # subprocess.call(
+    #     ["docker-compose", "exec", "wordpress1", "/fuzzer/patch_plugins.sh"] + additional_parameters
+    # )
+
+
+def get_container_id() -> bytes:
+    return subprocess.check_output(
+        [
+            "docker-compose",
+            "ps",
+            "-q",
+            "wordpress1",
+        ]
+    ).strip()
+
+def disconnect_network(container_id: bytes) -> int:
+    return subprocess.call(
+        ["docker", "network", "disconnect", "wpgarlic_network2", container_id]
+    )
+
+def disconnect_dns() -> None:
+    _run_in_container(['/fuzzer/disconnect_dns.sh'])
+    # subprocess.call(
+    #     ["docker-compose", "exec", "wordpress1", "/fuzzer/disconnect_dns.sh"]
+    # )
+
+def visit_admin_homepage() -> None:
+    # This is to execute plugin hooks in case it needs to do something
+    # on the first admin visit
+    _run_in_container(["/fuzzer/just_visit_admin_homepage.sh",])
 
 
 def reinitialize_containers():
@@ -92,12 +188,12 @@ def reinitialize_containers():
             "-d",
         ]
     )
-    run_in_container(
+    _run_in_container(
         ["/wait-for-it/wait-for-it.sh", "-h", "db1", "-p", "3306", "-t", "0"]
     )
     time.sleep(2)
-    run_in_container(["/fuzzer/create_findable_files.sh"])
-    run_in_container(
+    _run_in_container(["/fuzzer/create_findable_files.sh"])
+    _run_in_container(
         [
             "bash",
             "-c",
@@ -107,7 +203,7 @@ def reinitialize_containers():
 
 
 def install_plugin_from_svn(slug: str, revision: str):
-    run_in_container(
+    _run_in_container(
         [
             "svn",
             "co",
@@ -116,9 +212,9 @@ def install_plugin_from_svn(slug: str, revision: str):
             revision,
         ]
     )
-    run_in_container(["mv", slug, slug + ".tmp"])
-    run_in_container(["mv", slug + ".tmp/trunk", slug])
-    run_in_container(
+    _run_in_container(["mv", slug, slug + ".tmp"])
+    _run_in_container(["mv", slug + ".tmp/trunk", slug])
+    _run_in_container(
         [
             "zip",
             "-r",
@@ -126,7 +222,7 @@ def install_plugin_from_svn(slug: str, revision: str):
             slug,
         ]
     )
-    run_in_container(
+    _run_in_container(
         [
             "/fuzzer/nodebug.sh",
             "php.orig",
@@ -141,7 +237,7 @@ def install_plugin_from_svn(slug: str, revision: str):
 
 def fuzz_file_or_folder(payload_id: str, path: str):
     return json.loads(
-        run_in_container_and_get_output(
+        _run_in_container_and_get_output(
             [
                 "python3",
                 "/fuzzer/fuzz/fuzz_file_or_folder.py",
@@ -154,7 +250,7 @@ def fuzz_file_or_folder(payload_id: str, path: str):
 
 def fuzz_pages(payload_id: str):
     return json.loads(
-        run_in_container_and_get_output(
+        _run_in_container_and_get_output(
             [
                 "python3",
                 "/fuzzer/fuzz/fuzz_pages.py",
@@ -166,7 +262,7 @@ def fuzz_pages(payload_id: str):
 
 def fuzz_actions_admin(payload_id: str, actions_to_fuzz: str, plugin_slug: str):
     return json.loads(
-        run_in_container_and_get_output(
+        _run_in_container_and_get_output(
             [
                 "python3",
                 "/fuzzer/fuzz/fuzz_actions.py",
@@ -181,7 +277,7 @@ def fuzz_actions_admin(payload_id: str, actions_to_fuzz: str, plugin_slug: str):
 
 def fuzz_actions(payload_id: str, actions_to_fuzz: str, plugin_slug: str):
     return json.loads(
-        run_in_container_and_get_output(
+        _run_in_container_and_get_output(
             [
                 "python3",
                 "/fuzzer/fuzz/fuzz_actions.py",
@@ -195,7 +291,7 @@ def fuzz_actions(payload_id: str, actions_to_fuzz: str, plugin_slug: str):
 
 def fuzz_menu(payload_id: str, actions_to_fuzz: str, plugin_slug: str):
     return json.loads(
-        run_in_container_and_get_output(
+        _run_in_container_and_get_output(
             [
                 "python3",
                 "/fuzzer/fuzz/fuzz_menu.py",
@@ -209,7 +305,7 @@ def fuzz_menu(payload_id: str, actions_to_fuzz: str, plugin_slug: str):
 
 def fuzz_rest_routes(payload_id: str, routes_to_fuzz: str, plugin_slug: str):
     return json.loads(
-        run_in_container_and_get_output(
+        _run_in_container_and_get_output(
             [
                 "python3",
                 "/fuzzer/fuzz/fuzz_rest_routes.py",
@@ -221,10 +317,10 @@ def fuzz_rest_routes(payload_id: str, routes_to_fuzz: str, plugin_slug: str):
     )
 
 
-def grep_garlic_in_path(path: str) -> str:
+def _grep_garlic_in_path(path: str) -> str:
     # Here we assume the path comes from a trusted source. We aren't
     # immune to command injection here.
-    return run_in_container_and_get_output(
+    return _run_in_container_and_get_output(
         [
             "bash",
             "-c",
@@ -234,7 +330,7 @@ def grep_garlic_in_path(path: str) -> str:
 
 
 def find_payloads_in_files():
-    output = grep_garlic_in_path("/var/www/html")
+    output = _grep_garlic_in_path("/var/www/html")
 
     command_results = []
     for line in output.split("\n"):
@@ -267,8 +363,8 @@ def find_payloads_in_files():
 
 
 def find_payloads_in_admin():
-    run_in_container(["/fuzzer/download_admin.sh"])
-    output = grep_garlic_in_path("/var/www/html/127.0.0.1:8001")
+    _run_in_container(["/fuzzer/download_admin.sh"])
+    output = _grep_garlic_in_path("/var/www/html/127.0.0.1:8001")
 
     command_results = []
     for line in output.split("\n"):
@@ -287,8 +383,8 @@ def find_payloads_in_admin():
 
 
 def find_payloads_in_pages():
-    run_in_container(["/fuzzer/download_pages.sh"])
-    output = grep_garlic_in_path("/var/www/html/pages")
+    _run_in_container(["/fuzzer/download_pages.sh"])
+    output = _grep_garlic_in_path("/var/www/html/pages")
 
     command_results = []
     for line in output.split("\n"):

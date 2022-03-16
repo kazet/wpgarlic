@@ -103,9 +103,15 @@ and most of the subject. If you want to be sure, look at the plugin source.
 The first run of fuzzing or of the tests may take about an hour, because
 we need to build the Docker image with instrumented PHP and WordPress.
 
-### Fuzzing a plugin
+### Fuzzing a plugin by name
 ```
 ./bin/fuzz_plugin PLUGIN_SLUG
+```
+
+### Fuzzing a plugin from file
+You can also install plugin from a local zip file.
+```
+./bin/fuzz_plugin PLUGIN_FILE_NAME.zip
 ```
 
 ### Printing findings
@@ -134,8 +140,10 @@ To reformat and check the code, use:
 You may start a test environment with only one plugin installed using:
 
 ```
-./bin/manual_testing PLUGIN_SLUG
+./bin/manual_testing PLUGIN_SLUG|PLUGIN_PATH.zip
 ```
+
+You can install plugin using its slug or from a local zip file.
 
 It will listen on http://127.0.0.1:8001/
 

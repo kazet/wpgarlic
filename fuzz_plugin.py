@@ -3,28 +3,13 @@ import json
 import os
 import random
 import string
-import subprocess
 from typing import List, Optional
 
 import requests
 import typer
 
 import config
-from fuzzer_container import (
-    find_payloads_in_admin,
-    find_payloads_in_files,
-    find_payloads_in_pages,
-    fuzz_actions,
-    fuzz_actions_admin,
-    fuzz_file_or_folder,
-    fuzz_menu,
-    fuzz_pages,
-    fuzz_rest_routes,
-    install_plugin_from_svn,
-    install_plugin_from_file,
-    reinitialize_containers,
-)
-
+from fuzzer_container import *
 
 def get_dependencies(slug: str, description: str) -> List[str]:
     dependencies = []
@@ -51,7 +36,7 @@ def get_dependencies(slug: str, description: str) -> List[str]:
 
 
 def fuzz_plugin(
-    slug: str,
+    slug_or_path: str,
     version: Optional[str] = None,
     revision: Optional[str] = None,
     enabled_features: Optional[str] = None,
@@ -64,18 +49,20 @@ def fuzz_plugin(
 ):
 
     if file_or_folder_to_fuzz == "PLUGIN_ROOT":
-        file_or_folder_to_fuzz = f"/var/www/html/wp-content/plugins/{slug}"
+        file_or_folder_to_fuzz = f"/var/www/html/wp-content/plugins/{slug_or_path}"
 
     if not enabled_features:
         enabled_features = config.DEFAULT_ENABLED_FEATURES
     else:
         enabled_features = enabled_features.split(",")
 
-    if slug.endswith('.zip') and os.path.exists(slug):
-        plugin_path = slug
-        slug = os.path.basename(slug)
-        plugin_info_dict = {'version': 0, 'active_installs': 0, 'sections': {'description': ''}, 'from_file': True}
+    if slug_or_path.endswith('.zip') and os.path.exists(slug_or_path):
+        plugin_path = slug_or_path
+        slug = get_plugin_name_from_file(slug_or_path)
+        plugin_info_dict = {'version': 0, 'active_installs': 0, 'sections': {'description': ''}}
+        from_file = True
     else:
+        slug = slug_or_path
         assert all(
             [letter in string.ascii_letters + string.digits + "-_" for letter in slug]
         )
@@ -86,7 +73,7 @@ def fuzz_plugin(
             f"https://api.wordpress.org/plugins/info/1.2/?action=plugin_information"
             f"&request[slug]={slug}"
         ).json()
-        plugin_info_dict['from_file'] = False
+        from_file = False
 
     if version is None:
         version = plugin_info_dict["version"]
@@ -99,128 +86,42 @@ def fuzz_plugin(
         reinitialize_containers()
 
         try:
-            if plugin_info_dict['from_file']:
+            if install_dependencies:
+                for dependency in dependencies:
+                    install_dependency(dependency)
+                    activate_plugin(dependency)
+                    visit_admin_homepage()
+
+            if from_file:
                 install_plugin_from_file(plugin_path)
                 activation_problem = None
+            elif revision:
+                install_plugin_from_svn(slug, revision)
             else:
-                if install_dependencies:
-                    for dependency in dependencies:
-                        subprocess.call(
-                            [
-                                "docker-compose",
-                                "exec",
-                                "wordpress1",
-                                "/fuzzer/nodebug.sh",
-                                "php.orig",
-                                "/wp-cli.phar",
-                                "--allow-root",
-                                "plugin",
-                                "install",
-                                "--activate",
-                                dependency,
-                            ]
-                        )
-                        # This is to execute plugin hooks in case it needs to do something
-                        # on the first admin visit
-                        subprocess.call(
-                            [
-                                "docker-compose",
-                                "exec",
-                                "wordpress1",
-                                "/fuzzer/just_visit_admin_homepage.sh",
-                            ]
-                        )
+                install_plugin_from_slug(slug, version)
 
-                if revision:
-                    install_plugin_from_svn(slug, revision)
-                else:
-                    if version:
-                        additional_install_options = ["--version=" + version]
-                    else:
-                        additional_install_options = []
-                    subprocess.call(
-                        [
-                            "docker-compose",
-                            "exec",
-                            "wordpress1",
-                            "/fuzzer/nodebug.sh",
-                            "php.orig",
-                            "/wp-cli.phar",
-                            "--allow-root",
-                            "plugin",
-                            "install",
-                            slug,
-                        ]
-                        + additional_install_options
-                    )
+            try:
+                activate_plugin(slug)
+                activation_problem = None
+            except Exception as e:
+                activation_problem = repr(e)
 
-                try:
-                    subprocess.call(
-                        [
-                            "docker-compose",
-                            "exec",
-                            "wordpress1",
-                            "/fuzzer/nodebug.sh",
-                            "php.orig",
-                            "/wp-cli.phar",
-                            "--allow-root",
-                            "plugin",
-                            "activate",
-                            slug,
-                        ]
-                    )
-                    activation_problem = None
-                except Exception as e:
-                    activation_problem = repr(e)
-
-            subprocess.call(
-                [
-                    "docker-compose",
-                    "exec",
-                    "wordpress1",
-                    "chown",
-                    "-R",
-                    "www-data:www-data",
-                    "/var/www/html/",
-                ]
-            )
+            set_webroot_ownership()
 
             # This is to execute plugin hooks in case it needs to do something
             # on first admin visit. Let's do this multiple times for sure.
             for i in range(3):
-                subprocess.call(
-                    [
-                        "docker-compose",
-                        "exec",
-                        "wordpress1",
-                        "/fuzzer/just_visit_admin_homepage.sh",
-                    ]
-                )
+                visit_admin_homepage()
 
-            subprocess.call(
-                ["docker-compose", "exec", "wordpress1", "/fuzzer/patch_wordpress.sh"]
-            )
-            subprocess.call(
-                ["docker-compose", "exec", "wordpress1", "/fuzzer/patch_plugins.sh"]
-            )
+            patch_wordpress()
+            patch_plugins()
 
-            container_id = subprocess.check_output(
-                [
-                    "docker-compose",
-                    "ps",
-                    "-q",
-                    "wordpress1",
-                ]
-            ).strip()
+            container_id = get_container_id()
 
-            exit_code = subprocess.call(
-                ["docker", "network", "disconnect", "wpgarlic_network2", container_id]
-            )
+            exit_code = disconnect_network(container_id)
             assert exit_code == 0  # we don't want to fuzz on enabled networking
 
-            subprocess.call(
-                ["docker-compose", "exec", "wordpress1", "/fuzzer/disconnect_dns.sh"]
-            )
+            disconnect_dns()
 
             command_results = []
             tasks = list(
@@ -260,27 +161,11 @@ def fuzz_plugin(
             # After fuzzing (when we're just looking for results), we unpatch
             # plugins because we stop using the module that e.g. defines
             # __garlic_is_array.
-            subprocess.call(
-                [
-                    "docker-compose",
-                    "exec",
-                    "wordpress1",
-                    "/fuzzer/patch_plugins.sh",
-                    "--reverse",
-                ]
-            )
+            patch_wordpress(True)
 
             # We also need WordPress to not emit any logs that e.g. update_option
             # got called, because this would pollute output.
-            subprocess.call(
-                [
-                    "docker-compose",
-                    "exec",
-                    "wordpress1",
-                    "/fuzzer/patch_wordpress.sh",
-                    "--reverse",
-                ]
-            )
+            patch_plugins(True)
 
             if "find_in_files_after_fuzzing" in enabled_features:
                 command_results += find_payloads_in_files()
