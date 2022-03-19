@@ -140,7 +140,7 @@ To reformat and check the code, use:
 You may start a test environment with only one plugin installed using:
 
 ```
-./bin/manual_testing PLUGIN_SLUG|PLUGIN_PATH.zip
+./bin/manual_testing PLUGIN_SLUG|PLUGIN_PATH.zip [version]
 ```
 
 You can install plugin using its slug or from a local zip file.
