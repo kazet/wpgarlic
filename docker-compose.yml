@@ -16,6 +16,7 @@ services:
     networks:
       - network1
   wordpress1:
+    container_name: wordpress1
     depends_on:
       - db1
     build: docker_image/
