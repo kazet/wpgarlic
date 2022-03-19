@@ -109,7 +109,8 @@ we need to build the Docker image with instrumented PHP and WordPress.
 ```
 
 ### Fuzzing a plugin from file
-You can also install plugin from a local zip file.
+You can also install a plugin from a local zip file:
+
 ```
 ./bin/fuzz_plugin PLUGIN_FILE_NAME.zip
 ```
@@ -140,10 +141,10 @@ To reformat and check the code, use:
 You may start a test environment with only one plugin installed using:
 
 ```
-./bin/manual_testing PLUGIN_SLUG|PLUGIN_PATH.zip
+./bin/manual_testing PLUGIN_SLUG|PLUGIN_PATH.zip [version]
 ```
 
-You can install plugin using its slug or from a local zip file.
+You can install a plugin using its slug or from a local zip file.
 
 It will listen on http://127.0.0.1:8001/
 

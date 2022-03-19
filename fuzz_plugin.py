@@ -11,6 +11,7 @@ import typer
 import config
 from fuzzer_container import *
 
+
 def get_dependencies(slug: str, description: str) -> List[str]:
     dependencies = []
     if (
@@ -48,18 +49,19 @@ def fuzz_plugin(
     output_path: str = "data/plugin_fuzz_results",
 ):
 
-    if file_or_folder_to_fuzz == "PLUGIN_ROOT":
-        file_or_folder_to_fuzz = f"/var/www/html/wp-content/plugins/{slug_or_path}"
-
     if not enabled_features:
         enabled_features = config.DEFAULT_ENABLED_FEATURES
     else:
         enabled_features = enabled_features.split(",")
 
-    if slug_or_path.endswith('.zip') and os.path.exists(slug_or_path):
+    if slug_or_path.endswith(".zip") and os.path.exists(slug_or_path):
         plugin_path = slug_or_path
         slug = get_plugin_name_from_file(slug_or_path)
-        plugin_info_dict = {'version': 0, 'active_installs': 0, 'sections': {'description': ''}}
+        plugin_info_dict = {
+            "version": 0,
+            "active_installs": 0,
+            "sections": {"description": ""},
+        }
         from_file = True
     else:
         slug = slug_or_path
@@ -67,13 +69,15 @@ def fuzz_plugin(
             [letter in string.ascii_letters + string.digits + "-_" for letter in slug]
         )
 
-        plugin_info_dict = None
         print("Looking for", slug)
         plugin_info_dict = requests.get(
             f"https://api.wordpress.org/plugins/info/1.2/?action=plugin_information"
             f"&request[slug]={slug}"
         ).json()
         from_file = False
+
+    if file_or_folder_to_fuzz == "PLUGIN_ROOT":
+        file_or_folder_to_fuzz = f"/var/www/html/wp-content/plugins/{slug}"
 
     if version is None:
         version = plugin_info_dict["version"]
