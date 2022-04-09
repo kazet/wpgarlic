@@ -240,10 +240,14 @@ def print_findings_from_folder(
             )
 
     print(f"Unique filepaths total: {len(file_names)}")
-    print(
-        f"Filepaths with report printed: {num_paths_with_printed_reports} "
-        f"({100.0 * num_paths_with_printed_reports / len(file_names):.02f}%)"
-    )
+
+    if len(file_names) == 0:
+        print("No reports to print. Maybe all have been archived?")
+    else:
+        print(
+            f"Filepaths with report printed: {num_paths_with_printed_reports} "
+            f"({100.0 * num_paths_with_printed_reports / len(file_names):.02f}%)"
+        )
 
 
 if __name__ == "__main__":
