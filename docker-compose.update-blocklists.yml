@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  wordpress_update_blocklists:
+    container_name: wordpress_update_blocklists
+    depends_on:
+      - db_update_blocklists
+    build: docker_image/
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db_update_blocklists:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+  db_update_blocklists:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: wordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress

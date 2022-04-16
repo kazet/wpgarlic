@@ -23,7 +23,9 @@ woocommerce_page_coupons-moved
 woocommerce_page_wc-admin
 product_page_product_importer
 product_page_product_exporter
+appearance_page_custom-background
 woocommerce_page_wc-reports
 woocommerce_page_wc-settings
 woocommerce_page_wc-status
 woocommerce_page_wc-addons
+appearance_page_theme-editor

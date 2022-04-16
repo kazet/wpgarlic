@@ -37,3 +37,8 @@
 /tribe/events/v1/tags/(?P<id>\d+)@0
 /tribe/events/v1/tags/(?P<id>\d+)@1
 /tribe/events/v1/tags/(?P<id>\d+)@2
+/tribe/views/v2@0
+/tribe/views/v2/html@0
+/wp-block-editor/v1@0
+/wp-block-editor/v1/url-details@0
+/wp-block-editor/v1/export@0

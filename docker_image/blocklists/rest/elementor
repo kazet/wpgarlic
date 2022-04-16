@@ -12,3 +12,8 @@
 /elementor/v1/favorites/(?P<id>[\w]+)@0
 /elementor/v1/favorites/(?P<id>[\w]+)@1
 /elementor/v1/template-library/templates@0
+/elementor/v1/send-event@0
+/elementor/v1/send-event@1
+/wp-block-editor/v1@0
+/wp-block-editor/v1/url-details@0
+/wp-block-editor/v1/export@0

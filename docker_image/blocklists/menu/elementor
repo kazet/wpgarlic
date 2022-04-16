@@ -4,6 +4,7 @@ appearance_page_custom-background
 toplevel_page_elementor
 elementor_library_page_elementor-app
 elementor_library_page_e-landing-page
+elementor_library_page_http://127.0.0.1:8001/wp-admin/admin?page=elementor-app&ver=3.6.4#/kit-library
 elementor_page_elementor-role-manager
 appearance_page_theme-editor
 elementor_page_elementor-tools

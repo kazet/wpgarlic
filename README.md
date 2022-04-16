@@ -189,3 +189,15 @@ scan a large number of Wordpress plugins, not to perform comprehensive tests of 
 ### Doesn't work? Have a question?
 File a Github ticket or e-mail me: kazet@p4.team.
 
+## Fuzzer internals
+### Blocklists
+Some plugins need other ones (e.g. woocommerce) as a dependency. When fuzzing a plugin that has
+a dependency, we want to fuzz only the chosen plugin and skip the dependency AJAX actions,
+REST routes and menu pages. We want to fuzz woocommerce actions/routes/pages only when we picked
+woocommerce to fuzz.
+
+List of dependency actions/routes/pages are called blocklists and are listed in `docker_image/blocklists/`.
+Files named `common` contain the WordPress core actions/routes/pages - we don't want to fuzz these
+as well.
+
+To update these blocklists, use `./bin/update_blocklists`.

@@ -6,6 +6,7 @@ wp_ajax_add-nav_menu
 wp_ajax_add-link_category
 wp_ajax_add-post_format
 wp_ajax_add-wp_theme
+wp_ajax_add-wp_template_part_area
 wp_ajax_elementor_js_log
 wp_ajax_elementor_clear_cache
 wp_ajax_elementor_replace_url

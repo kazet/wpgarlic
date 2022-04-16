@@ -1,0 +1,55 @@
+#!/bin/bash
+
+cd "$(dirname "$0")/.."
+
+function run_docker_compose {
+    docker-compose -f docker-compose.update-blocklists.yml "$@"
+}
+
+function exec {
+    run_docker_compose exec wordpress_update_blocklists "$@"
+}
+
+function rebuild_and_restart {
+    run_docker_compose stop
+    run_docker_compose rm -f
+    run_docker_compose build
+    run_docker_compose up -d
+    exec bash -c \
+        "/wait-for-it/wait-for-it.sh db_update_blocklists:3306 --timeout=100 -- mysql --host=db_update_blocklists -u wordpress --password=wordpress wordpress < /fuzzer/dump.sql"
+}
+
+function get_ajax_actions {
+    exec \
+        php.orig /fuzzer/get_fuzzable_entrypoints/get_ajax_actions_to_fuzz.php \
+        | grep AJAX: | cut -d" " -f2- | tr -d \\r
+}
+
+function get_menu_actions {
+    exec \
+        php.orig /fuzzer/get_fuzzable_entrypoints/get_menu_actions_to_fuzz.php \
+        | grep MENU: | cut -d" " -f2- | tr -d \\r
+}
+
+function get_rest_routes {
+    exec \
+        php.orig /fuzzer/get_fuzzable_entrypoints/get_rest_routes_to_fuzz.php \
+        | grep REST_ROUTE: | cut -d" " -f2- | tr -d \\r
+}
+
+rebuild_and_restart
+
+get_ajax_actions > docker_image/blocklists/actions/common
+get_menu_actions > docker_image/blocklists/menu/common
+get_rest_routes > docker_image/blocklists/rest/common
+
+for plugin in contact-form-7 elementor the-events-calendar woocommerce; do
+    rebuild_and_restart
+
+    exec bash -c \
+        "php.orig /wp-cli.phar --allow-root plugin install --activate $plugin < /dev/null"
+
+    get_ajax_actions > docker_image/blocklists/actions/$plugin
+    get_menu_actions > docker_image/blocklists/menu/$plugin
+    get_rest_routes > docker_image/blocklists/rest/$plugin
+done

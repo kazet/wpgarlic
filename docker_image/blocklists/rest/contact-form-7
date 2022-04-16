@@ -6,3 +6,6 @@
 /contact-form-7/v1/contact-forms/(?P<id>\d+)@2
 /contact-form-7/v1/contact-forms/(?P<id>\d+)/feedback@0
 /contact-form-7/v1/contact-forms/(?P<id>\d+)/refill@0
+/wp-block-editor/v1@0
+/wp-block-editor/v1/url-details@0
+/wp-block-editor/v1/export@0
