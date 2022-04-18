@@ -175,20 +175,6 @@ Fuzzing files (i.e. executing each PHP file with injected payloads) has been dis
 because it didn't lead to many findings. Uncomment `files` in  `config.DEFAULT_ENABLED_FEATURES`
 to change that.
 
-## FAQ
-### Fuzzer found something, is this a vulnerability?
-Maybe. Install the plugin in a local test environment (for example you may use the one described in
-the *Manual testing environment* section) and analyze the bug.
-
-### Fuzzer found nothing, is the plugin secure?
-**Don't assume that.** The fuzzer finds some classes of vulnerabilities, but has its limitations.
-
-Fuzzer founds nothing for most of the plugins - the purpose of the tool is rather to massively
-scan a large number of Wordpress plugins, not to perform comprehensive tests of a single plugin.
-
-### Doesn't work? Have a question?
-File a Github ticket or e-mail me: kazet@p4.team.
-
 ## Fuzzer internals
 ### Blocklists
 Some plugins need other ones (e.g. woocommerce) as a dependency. When fuzzing a plugin that has
@@ -201,3 +187,22 @@ Files named `common` contain the WordPress core actions/routes/pages - we don't 
 as well.
 
 To update these blocklists, use `./bin/update_blocklists`.
+
+## FAQ
+### Fuzzer found something, is this a vulnerability?
+Maybe. Install the plugin in a local test environment (for example you may use the one described in
+the *Manual testing environment* section) and analyze the bug.
+
+### Fuzzer found nothing, is the plugin secure?
+**Don't assume that.** The fuzzer finds some classes of vulnerabilities, but has its limitations.
+
+Fuzzer founds nothing for most of the plugins - the purpose of the tool is rather to massively
+scan a large number of Wordpress plugins, not to perform comprehensive tests of a single plugin.
+
+### Fuzzer found something in one run, but not in the next one. What happened?
+This is possible. The fuzzer chooses payloads randomly, and introduces randomness in other places (e.g.
+how the`==` operator should behave in cases described in
+https://kazet.cc/2022/02/03/fuzzing-wordpress-plugins.html#patched-equality).
+
+### Doesn't work? Have a question?
+File a Github ticket or e-mail me: kazet@p4.team.
