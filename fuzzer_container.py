@@ -131,8 +131,20 @@ def get_container_id() -> bytes:
 
 
 def disconnect_network(container_id: bytes) -> int:
+    networks = subprocess.check_output(
+        ["docker", "network", "ls", "--format", "{{.Name}}"]
+    ).decode("utf-8")
+
+    network_name = "wpgarlic_network2"
+
+    if network_name not in networks.split():
+        raise Exception(
+            f"Network {network_name} not found. Make sure the folder name "
+            "where the tool is stored is `wpgarlic`"
+        )
+
     return subprocess.call(
-        ["docker", "network", "disconnect", "wpgarlic_network2", container_id]
+        ["docker", "network", "disconnect", network_name, container_id]
     )
 
 
