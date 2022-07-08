@@ -32,9 +32,17 @@ COPY php_source_patch.patch /fuzzer/php_source_patch.patch
 
 RUN /fuzzer/compile_php.sh
 
+RUN docker-php-ext-configure opcache
+RUN docker-php-ext-install opcache
+RUN docker-php-ext-enable opcache
+
 RUN docker-php-ext-configure sockets
 RUN docker-php-ext-install sockets
 RUN docker-php-ext-enable sockets
+
+RUN docker-php-ext-configure pcntl
+RUN docker-php-ext-install pcntl
+RUN docker-php-ext-enable pcntl
 
 # I know there is a still decreasing number of sites with this configuration, but let's
 # assume for now we want to observe bugs of that kind.
@@ -68,3 +76,7 @@ COPY patch_wordpress.sh /fuzzer/patch_wordpress.sh
 
 COPY test /fuzzer/test
 COPY wordpress_patches /fuzzer/wordpress_patches
+
+COPY php.ini /usr/local/lib/php.ini
+
+RUN mkdir /opcache
