@@ -1,4 +1,4 @@
-FROM wordpress:5.9.0-php7.4-apache
+FROM wordpress:6.0.0-php7.4-apache
 
 RUN apt-get update
 RUN apt-get -yy install \

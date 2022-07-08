@@ -1,5 +1,5 @@
-*** wp-load.php.orig	Sat May 15 17:38:05 2021
---- wp-load.php	Sat Nov 27 15:45:35 2021
+*** /var/www/html/wp-load.php.orig	Fri Jul  8 18:38:42 2022
+--- /var/www/html/wp-load.php	Fri Jul  8 18:38:42 2022
 ***************
 *** 59,71 ****
   	// A config file doesn't exist.

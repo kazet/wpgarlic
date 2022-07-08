@@ -1,5 +1,5 @@
-*** wp-settings.php.orig	Mon Feb 21 16:39:26 2022
---- wp-settings.php	Mon Feb 21 16:40:00 2022
+*** /var/www/html/wp-settings.php.orig	Fri Jul  8 18:38:42 2022
+--- /var/www/html/wp-settings.php	Fri Jul  8 18:38:42 2022
 ***************
 *** 65,77 ****
   
@@ -17,7 +17,7 @@
   timer_start();
 --- 65,74 ----
 ***************
-*** 450,462 ****
+*** 461,473 ****
   do_action( 'plugins_loaded' );
   
   // Define constants which affect functionality if not already defined.
@@ -31,4 +31,4 @@
    *
    * @since 2.0.11
    */
---- 447,456 ----
+--- 458,467 ----
