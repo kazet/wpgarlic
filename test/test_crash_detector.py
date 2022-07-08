@@ -60,3 +60,19 @@ class CrashDetectorTest(unittest.TestCase):
             ["php", "-r", 'file_get_contents("http://GARLICGARLICGARLIC.example.com");']
         )
         self.assertAnyMatcherWouldDetect(output)
+
+    def test_call_user_func_crashes_are_detected(self):
+        output = run_in_container_and_get_output(
+            ["php", "-r", 'call_user_func("http://GARLICGARLICGARLIC.example.com");']
+        )
+        self.assertAnyMatcherWouldDetect(output)
+
+    def test_call_user_func_array_crashes_are_detected(self):
+        output = run_in_container_and_get_output(
+            [
+                "php",
+                "-r",
+                'call_user_func_array("http://GARLICGARLICGARLIC.example.com", array());',
+            ]
+        )
+        self.assertAnyMatcherWouldDetect(output)

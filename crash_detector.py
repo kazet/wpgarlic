@@ -17,7 +17,7 @@ def get_matchers(
         re.compile("unlink.{0,256}GARLIC", flags),
         # I decided to skip this one due to a large number of false positives.
         # Feel free to uncomment.
-        # re.compile("Warning: call_user_func", flags),
+        re.compile("function '.{0,30}GARLIC.{0,30}' not found", flags),
         re.compile("SQL syntax.{0,2048}GARLIC", flags),
         re.compile("<GARLIC", flags),
         # Forgot quotes that allow xss?
