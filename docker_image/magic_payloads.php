@@ -22,6 +22,7 @@ $payloads = array(
     "GARLIC GARLIC'\"`",
     "</GARLIC'\"`>",
     "GARLIC GARLIC'\"`",
+    "GARLIC GARLIC\\",
     "1",
     "invalidfolderGARLIC/filenameGARLIC",
     "http://GARLICGARLICGARLIC.example.com",
