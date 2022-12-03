@@ -16,6 +16,9 @@ def is_call_interesting(call: dict, in_admin: bool, fuzzer_output_path: str):
         # arbitrary options
         return "GARLIC" in call["data"]["name"]
 
+    if call["what"] in ["wp_delete_user"]:
+        return True
+
     if call["what"] in ["update_post_meta"]:
         return True
 
@@ -110,6 +113,7 @@ def is_header_interesting(header: str):
         and not header.startswith("location: http://127.0.0.1:8001/")
         and not header.startswith("location: https://:8001/")
         and not header.startswith("location: http://:8001/")
+        and not header.startswith("location: ://:8001/")
         and not header.startswith("location: https://elementor.com/pro/")
         and not header.startswith("location: ?")
         and "garlic" in header
