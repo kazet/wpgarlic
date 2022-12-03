@@ -242,6 +242,15 @@ function do_rest_route_with_user($id, $username) {
 		    	continue;
     		}
 
+            if (getenv("TOP_LEVEL_NAVIGATION_ONLY")) {
+                if (is_array($handler['methods']) && !in_array("GET", $handler['methods'])) {
+                    continue;
+                }
+                if (!is_array($handler['methods']) && $handler['methods'] != "GET") {
+                    continue;
+                }
+            }
+
 	    	$request = new Fake_WP_REST_Request($key);
 		    if (
                     (!array_key_exists('permission_callback', $handler)) ||
