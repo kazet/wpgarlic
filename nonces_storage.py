@@ -1,10 +1,13 @@
 import base64
 import os
 import re
+import subprocess
 import typing
 
 NONCE_RE = re.compile("__GARLIC_NONCE__(.*?)__ENDGARLIC__")
-NONCE_FILENAME = os.environ.get("NONCE_FILENAME_OVERRIDE", os.path.join(os.path.dirname(__file__), 'nonces.txt'))
+
+# We add hostname to the nonce filename to decrease the chance of overriding when rsyncing
+NONCE_FILENAME = os.environ.get("NONCE_FILENAME_OVERRIDE", os.path.join(os.path.dirname(__file__), f'nonces-{subprocess.check_output("hostname").decode("ascii").strip()}.txt'))
 
 
 def collect_nonces(plugin_name: str, outs: typing.List[dict]) -> None:
