@@ -133,7 +133,7 @@ class FuzzerE2ETest(unittest.TestCase):
                 plugin,
                 "--skip-fuzzing-second-time-without-dependencies",
                 "--enabled-features",
-                "menu",
+                "menu_admin",
                 "--output-path",
                 output_path,
             ]
@@ -155,7 +155,7 @@ class FuzzerE2ETest(unittest.TestCase):
                 plugin,
                 "--skip-fuzzing-second-time-without-dependencies",
                 "--enabled-features",
-                "menu",
+                "menu_admin",
                 "--menu-actions-to-fuzz",
                 action,
                 "--output-path",

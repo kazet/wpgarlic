@@ -8,12 +8,14 @@ from utils import fuzz_command, load_blocklists
 payload_id = sys.argv[1]
 actions_to_fuzz = sys.argv[2]
 plugin_slug = sys.argv[3]
+user_id = sys.argv[4]
 
 if actions_to_fuzz == "ALL":
     actions_to_fuzz = subprocess.check_output(
         [
             "php.orig",
             "/fuzzer/get_fuzzable_entrypoints/get_menu_actions_to_fuzz.php",
+            user_id,
         ]
     )
 
@@ -37,9 +39,9 @@ for action in actions_to_fuzz:
     sys.stderr.write(f"Fuzzing: {action}\n")
     sys.stderr.flush()
 
-    object_name = "menu: " + action
+    object_name = "menu: " + action + f" (user_id={user_id})"
     command_results += fuzz_command(
-        f"TOP_LEVEL_NAVIGATION_ONLY=1 php /fuzzer/execute/do_menu_action.php '{action}'",
+        f"TOP_LEVEL_NAVIGATION_ONLY=1 php /fuzzer/execute/do_menu_action.php '{action}' {user_id}",
         payload_id,
         object_name,
     )

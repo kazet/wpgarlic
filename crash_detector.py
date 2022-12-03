@@ -3,7 +3,7 @@ import typing
 
 
 def get_matchers(
-    in_admin: bool,
+    in_admin_or_profile: bool,
 ) -> typing.List["re.Pattern"]:
     flags = re.DOTALL | re.IGNORECASE
     matchers = [
@@ -40,7 +40,7 @@ def get_matchers(
         re.compile("simplexml_load_string().{0,256}BAD XML", flags),
     ]
 
-    if not in_admin:
+    if not in_admin_or_profile:
         matchers.extend(
             [
                 re.compile("get_users", flags),

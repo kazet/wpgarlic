@@ -5,6 +5,7 @@ import sys
 from utils import fuzz_command
 
 payload_id = sys.argv[1]
+user_id = sys.argv[2]
 
 pages = [
     ("/var/www/html/index.php", ""),
@@ -28,7 +29,7 @@ for file_name, query in pages:
 
     object_name = "page: " + file_name + "?" + query
     command_results += fuzz_command(
-        f"php /fuzzer/execute/do_page.php '{file_name}' '{query}'",
+        f"php /fuzzer/execute/do_page.php '{file_name}' '{query}' {user_id}",
         payload_id,
         object_name,
     )

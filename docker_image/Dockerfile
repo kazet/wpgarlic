@@ -59,6 +59,7 @@ COPY dump.sql /fuzzer/dump.sql
 COPY magic_payloads.php /fuzzer/magic_payloads.php
 COPY functions.php /fuzzer/functions.php
 COPY set_admin.php /fuzzer/set_admin.php
+COPY user.php /fuzzer/user.php
 COPY blocklists /fuzzer/blocklists
 
 COPY get_fuzzable_entrypoints /fuzzer/get_fuzzable_entrypoints

@@ -266,13 +266,14 @@ def fuzz_file_or_folder(payload_id: str, path: str):
     )
 
 
-def fuzz_pages(payload_id: str):
+def fuzz_pages(payload_id: str, user_id: int):
     return json.loads(
         run_in_container_and_get_output(
             [
                 "python3",
                 "/fuzzer/fuzz/fuzz_pages.py",
                 payload_id,
+                str(user_id),
             ]
         )
     )
@@ -307,7 +308,7 @@ def fuzz_actions(payload_id: str, actions_to_fuzz: str, plugin_slug: str):
     )
 
 
-def fuzz_menu(payload_id: str, actions_to_fuzz: str, plugin_slug: str):
+def fuzz_menu(payload_id: str, actions_to_fuzz: str, plugin_slug: str, user_id: int):
     return json.loads(
         run_in_container_and_get_output(
             [
@@ -316,6 +317,7 @@ def fuzz_menu(payload_id: str, actions_to_fuzz: str, plugin_slug: str):
                 payload_id,
                 actions_to_fuzz,
                 plugin_slug,
+                str(user_id),
             ]
         )
     )

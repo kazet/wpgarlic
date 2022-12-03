@@ -132,7 +132,17 @@ def fuzz_plugin(
             command_results = []
             command_results_but_not_for_nonces = []
             tasks = list(
-                {"actions", "actions_admin", "menu", "files", "pages", "rest_routes", "rest_routes_admin"}
+                {
+                    "actions",
+                    "actions_admin",
+                    "menu_subscriber",
+                    "menu_admin",
+                    "files",
+                    "pages_subscriber",
+                    "pages_not_logged_in",
+                    "rest_routes",
+                    "rest_routes_admin"
+                }
                 & set(enabled_features)
             )
             random.shuffle(tasks)
@@ -157,12 +167,18 @@ def fuzz_plugin(
                         command_results_but_not_for_nonces += fuzz_rest_routes_admin(
                             "RANDOM", rest_routes_to_fuzz, slug
                         )
-                    elif task == "menu":
+                    elif task == "menu_subscriber":
                         command_results_but_not_for_nonces += fuzz_menu(
-                            "RANDOM", menu_actions_to_fuzz, slug
+                            "RANDOM", menu_actions_to_fuzz, slug, 2
                         )
-                    elif task == "pages":
-                        command_results += fuzz_pages("RANDOM")
+                    elif task == "menu_admin":
+                        command_results_but_not_for_nonces += fuzz_menu(
+                            "RANDOM", menu_actions_to_fuzz, slug, 1
+                        )
+                    elif task == "pages_subscriber":
+                        command_results += fuzz_pages("RANDOM", 2)
+                    elif task == "pages_not_logged_in":
+                        command_results += fuzz_pages("RANDOM", 0)
                     else:
                         assert False
                 except ValueError as e:

@@ -24,6 +24,8 @@ $payloads = array(
     "GARLIC GARLIC'\"`",
     "GARLIC GARLIC\\",
     "1",
+    "2",
+    "99",  # nonexistent id
     "invalidfolderGARLIC/filenameGARLIC",
     "http://GARLICGARLICGARLIC.example.com",
     'O:21:"GARLICNonexistentClass":0:{}',
@@ -123,11 +125,12 @@ class MagicPayloadDictionary implements JsonSerializable {
         if (in_array(
             $key,
             array(
-                "_wpnonce",
+                "wp_screen_options",
                 "_ajax_nonce",
                 "_locale",
                 "_jsonp",
                 "_wp_http_referer",
+                "import",
                 "wp_lang",
                 "wp_scrape_key",
                 "customize_changeset_uuid",
@@ -278,7 +281,11 @@ class MagicPayloadDictionary implements JsonSerializable {
 }
 
 
-class MagicArray extends MagicPayloadDictionary implements ArrayAccess {
+class MagicArray extends MagicPayloadDictionary implements ArrayAccess, Countable {
+    function count() {
+        return rand() % 3;
+    }
+
     function offsetSet($offset, $value) {
         $this->original[$offset] = $value;
         return $value;
