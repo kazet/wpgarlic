@@ -16,8 +16,6 @@ def get_matchers(
         re.compile("include_once\\(.{0,256}[^_D]GARLIC", flags),
         re.compile("file_get_contents{0,256}GARLIC", flags),
         re.compile("unlink.{0,256}GARLIC", flags),
-        # I decided to skip this one due to a large number of false positives.
-        # Feel free to uncomment.
         re.compile("function '.{0,30}GARLIC.{0,30}' not found", flags),
         re.compile("SQL syntax.{0,2048}GARLIC", flags),
         re.compile("<GARLIC", flags),
@@ -32,7 +30,9 @@ def get_matchers(
         re.compile("syntax error", flags),
         re.compile("__GARLIC_ACCESSED__", flags),
         re.compile("GARLIC.{0,256}No such file", flags),
-        re.compile("GARLIC.{0,512}thrown in", flags),
+        # I decided to skip this one due to a large number of false positives.
+        # Feel free to uncomment.
+        # re.compile("GARLIC.{0,512}thrown in", flags),
         re.compile("GARLIC.{0,64}[Nn]ot found", flags),
         re.compile("GARLIC.{0,512}failed to open stream", flags),
         re.compile("command not found", flags),
@@ -44,6 +44,7 @@ def get_matchers(
         matchers.extend(
             [
                 re.compile("get_users", flags),
+                re.compile("UserFullName", flags),
                 re.compile("fuzz.{0,20}@example.com", flags),
                 re.compile("file_GARLIC", flags),
             ]
