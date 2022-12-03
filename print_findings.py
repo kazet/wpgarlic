@@ -1,4 +1,3 @@
-import random
 import binascii
 import json
 import os
@@ -56,9 +55,9 @@ class FindingsPrinter:
             intercepted_variables_info.append(
                 "May as well be equal: "
                 + binascii.unhexlify(match.group(1)).decode("ascii", "ignore")
-               + " and "
-               + binascii.unhexlify(match.group(2)).decode("ascii", "ignore")
-           )
+                + " and "
+                + binascii.unhexlify(match.group(2)).decode("ascii", "ignore")
+            )
 
         call_matches = list(fuzzer_output_regexes.CALL_RE.finditer(output))
         header_matches = list(fuzzer_output_regexes.HEADER_RE.finditer(output))
@@ -81,7 +80,7 @@ class FindingsPrinter:
             file_or_action.startswith("menu:")
             or file_or_action == "ADMIN OUTPUT"
             or file_or_action.endswith(" (admin)")
-            or '/var/www/html/wp-admin/profile.php' in file_or_action
+            or "/var/www/html/wp-admin/profile.php" in file_or_action
         )
         matchers = crash_detector.get_matchers(in_admin_or_profile)
         to_print = []
@@ -128,7 +127,10 @@ class FindingsPrinter:
         for match in call_matches:
             call_information = json.loads(match.group(1))
             if filtering.is_call_interesting(
-                call_information, in_admin_or_profile, fuzzer_output_path, file_or_action
+                call_information,
+                in_admin_or_profile,
+                fuzzer_output_path,
+                file_or_action,
             ):
                 to_print.append(
                     f"Call: {call_information['what']} arguments={call_information['data']}"

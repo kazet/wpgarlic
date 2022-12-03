@@ -141,7 +141,7 @@ def fuzz_plugin(
                     "pages_subscriber",
                     "pages_not_logged_in",
                     "rest_routes",
-                    "rest_routes_admin"
+                    "rest_routes_admin",
                 }
                 & set(enabled_features)
             )

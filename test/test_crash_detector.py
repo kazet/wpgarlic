@@ -57,7 +57,11 @@ class CrashDetectorTest(unittest.TestCase):
 
     def test_file_write_crashes_are_detected(self):
         output = run_in_container_and_get_output(
-            ["php", "-r", 'file_put_contents("invalidfolderGARLIC/filenameGARLIC", "test");']
+            [
+                "php",
+                "-r",
+                'file_put_contents("invalidfolderGARLIC/filenameGARLIC", "test");',
+            ]
         )
         self.assertAnyMatcherWouldDetect(output)
 
@@ -85,6 +89,10 @@ class CrashDetectorTest(unittest.TestCase):
 
     def test_error_silencing_is_detected(self):
         output = run_in_container_and_get_output(
-            ["bash", "-c", 'php -r \'include("/fuzzer/magic_payloads.php"); @file_get_contents("GARLIC");\' 2>&1']
+            [
+                "bash",
+                "-c",
+                'php -r \'include("/fuzzer/magic_payloads.php"); @file_get_contents("GARLIC");\' 2>&1',
+            ]
         )
         self.assertAnyMatcherWouldDetect(output)

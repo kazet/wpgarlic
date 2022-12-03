@@ -6,13 +6,17 @@ except ImportError:
     filtering_custom = None
 
 
-def is_call_interesting(call: dict, in_admin_or_profile: bool, fuzzer_output_path: str, file_or_action: str):
+def is_call_interesting(
+    call: dict, in_admin_or_profile: bool, fuzzer_output_path: str, file_or_action: str
+):
     if filtering_custom:
-        if filtering_custom.filter_call(call, in_admin_or_profile, fuzzer_output_path, file_or_action):
+        if filtering_custom.filter_call(
+            call, in_admin_or_profile, fuzzer_output_path, file_or_action
+        ):
             return False
 
     if call["what"] in ["delete_option", "delete_site_option"]:
-        if call['data']['name'].startswith('_transient_'):
+        if call["data"]["name"].startswith("_transient_"):
             return False
         # For now, let's take into account only the possibility to delete
         # arbitrary options
@@ -238,7 +242,9 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
         flags=re.M,
     )
     output = re.sub(
-        "Fatal error: Uncaught Exception: DateTime::__construct\\(\\): Failed to parse time string " + SHORT_STRING + " at position",
+        "Fatal error: Uncaught Exception: DateTime::__construct\\(\\): Failed to parse time string "
+        + SHORT_STRING
+        + " at position",
         "--false-positive--",
         output,
         flags=re.M,

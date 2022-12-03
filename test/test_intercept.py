@@ -21,7 +21,7 @@ class FuzzerInterceptTest(unittest.TestCase):
         s = re.sub(fuzzer_output_regexes.HEADER_RE, "", s)
         s = re.sub(fuzzer_output_regexes.INTERCEPT_RE, "", s)
         result = ""
-        for line in s.split('\n'):
+        for line in s.split("\n"):
             if line.startswith("Warning:"):
                 continue
             result += line + "\n"
