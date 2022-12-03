@@ -130,6 +130,7 @@ def fuzz_plugin(
             disconnect_dns()
 
             command_results = []
+            command_results_but_not_for_nonces = []
             tasks = list(
                 {"actions", "actions_admin", "menu", "files", "pages", "rest_routes", "rest_routes_admin"}
                 & set(enabled_features)
@@ -145,7 +146,7 @@ def fuzz_plugin(
                     elif task == "actions":
                         command_results += fuzz_actions("RANDOM", actions_to_fuzz, slug)
                     elif task == "actions_admin":
-                        command_results += fuzz_actions_admin(
+                        command_results_but_not_for_nonces += fuzz_actions_admin(
                             "RANDOM", actions_to_fuzz, slug
                         )
                     elif task == "rest_routes":
@@ -153,11 +154,11 @@ def fuzz_plugin(
                             "RANDOM", rest_routes_to_fuzz, slug
                         )
                     elif task == "rest_routes_admin":
-                        command_results += fuzz_rest_routes_admin(
+                        command_results_but_not_for_nonces += fuzz_rest_routes_admin(
                             "RANDOM", rest_routes_to_fuzz, slug
                         )
                     elif task == "menu":
-                        command_results += fuzz_menu(
+                        command_results_but_not_for_nonces += fuzz_menu(
                             "RANDOM", menu_actions_to_fuzz, slug
                         )
                     elif task == "pages":
@@ -178,20 +179,20 @@ def fuzz_plugin(
             patch_plugins(True)
 
             if "find_in_files_after_fuzzing" in enabled_features:
-                command_results += find_payloads_in_files()
+                command_results_but_not_for_nonces += find_payloads_in_files()
 
             if "find_in_pages_after_fuzzing" in enabled_features:
                 command_results += find_payloads_in_pages()
 
             if "find_in_admin_after_fuzzing" in enabled_features:
-                command_results += find_payloads_in_admin()
+                command_results_but_not_for_nonces += find_payloads_in_admin()
 
             collect_nonces(slug, command_results)
 
             output = {
                 "version": version,
                 "active_installs": active_installs,
-                "command_results": command_results,
+                "command_results": command_results + command_results_but_not_for_nonces,
                 "activation_problem": activation_problem,
             }
         except Exception as e:
