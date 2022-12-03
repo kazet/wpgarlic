@@ -20,7 +20,12 @@ class FuzzerInterceptTest(unittest.TestCase):
     def _clean(s: str):
         s = re.sub(fuzzer_output_regexes.HEADER_RE, "", s)
         s = re.sub(fuzzer_output_regexes.INTERCEPT_RE, "", s)
-        return s.strip()
+        result = ""
+        for line in s.split('\n'):
+            if line.startswith("Warning:"):
+                continue
+            result += line + "\n"
+        return result.strip()
 
     def test_payload_randomization(self):
         stdouts = []
@@ -197,7 +202,7 @@ class FuzzerInterceptTest(unittest.TestCase):
             "RANDOM", "/fuzzer/test/equality.php"
         )
         counter = collections.Counter(
-            [command["stdout"].strip() for command in commands]
+            [self._clean(command["stdout"]) for command in commands]
         )
 
         self.assertGreaterEqual(counter["bool(false)"], 20)
@@ -208,7 +213,7 @@ class FuzzerInterceptTest(unittest.TestCase):
             "RANDOM", "/fuzzer/test/strict_equality.php"
         )
         counter = collections.Counter(
-            [command["stdout"].strip() for command in commands]
+            [self._clean(command["stdout"]) for command in commands]
         )
 
         self.assertGreaterEqual(counter["bool(false)"], 20)
