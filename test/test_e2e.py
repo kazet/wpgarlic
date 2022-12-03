@@ -254,8 +254,8 @@ class FuzzerE2ETest(unittest.TestCase):
         self._fuzz_rest_route_and_check_expected_strings(
             "wp-seopress",
             ["--version", "5.0.3"],
-            '/seopress/v1/posts/(?P<id>\d+)/title-description-metas@1',
-            ["Call: update_post_meta arguments={"]
+            "/seopress/v1/posts/(?P<id>\\d+)/title-description-metas@1",
+            ["Call: update_post_meta arguments={"],
         )
 
     @retry()
