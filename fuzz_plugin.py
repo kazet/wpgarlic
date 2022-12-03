@@ -129,7 +129,7 @@ def fuzz_plugin(
 
             command_results = []
             tasks = list(
-                {"actions", "actions_admin", "menu", "files", "pages", "rest_routes"}
+                {"actions", "actions_admin", "menu", "files", "pages", "rest_routes", "rest_routes_admin"}
                 & set(enabled_features)
             )
             random.shuffle(tasks)
@@ -148,6 +148,10 @@ def fuzz_plugin(
                         )
                     elif task == "rest_routes":
                         command_results += fuzz_rest_routes(
+                            "RANDOM", rest_routes_to_fuzz, slug
+                        )
+                    elif task == "rest_routes_admin":
+                        command_results += fuzz_rest_routes_admin(
                             "RANDOM", rest_routes_to_fuzz, slug
                         )
                     elif task == "menu":

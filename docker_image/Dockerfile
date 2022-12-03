@@ -78,5 +78,6 @@ COPY test /fuzzer/test
 COPY wordpress_patches /fuzzer/wordpress_patches
 
 COPY php.ini /usr/local/lib/php.ini
+COPY rest.php /fuzzer/rest.php
 
 RUN mkdir /opcache

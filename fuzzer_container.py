@@ -323,6 +323,21 @@ def fuzz_rest_routes(payload_id: str, routes_to_fuzz: str, plugin_slug: str):
     )
 
 
+def fuzz_rest_routes_admin(payload_id: str, routes_to_fuzz: str, plugin_slug: str):
+    return json.loads(
+        run_in_container_and_get_output(
+            [
+                "python3",
+                "/fuzzer/fuzz/fuzz_rest_routes.py",
+                payload_id,
+                routes_to_fuzz,
+                plugin_slug,
+                "BECOME_ADMIN",
+            ]
+        )
+    )
+
+
 def _grep_garlic_in_path(path: str) -> str:
     # Here we assume the path comes from a trusted source. We aren't
     # immune to command injection here.

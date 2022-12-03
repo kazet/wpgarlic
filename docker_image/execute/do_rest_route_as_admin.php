@@ -6,4 +6,4 @@ include("/fuzzer/magic_payloads.php");
 include('/var/www/html/wp-load.php');
 include("/fuzzer/rest.php");
 
-do_rest_route_with_user(2, "subscriber");
+do_rest_route_with_user(1, "admin");

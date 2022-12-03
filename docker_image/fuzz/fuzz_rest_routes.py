@@ -8,6 +8,7 @@ from utils import fuzz_command, load_blocklists
 payload_id = sys.argv[1]
 routes = sys.argv[2]
 plugin_slug = sys.argv[3]
+become_admin = len(sys.argv) > 4 and sys.argv[4] == "BECOME_ADMIN"
 
 if routes == "ALL":
     routes = subprocess.check_output(
@@ -37,10 +38,18 @@ for route in routes:
     sys.stderr.write(f"Fuzzing: {route}\n")
     sys.stderr.flush()
 
+    if become_admin:
+        cmd = "do_rest_route_as_admin"
+        prefix = "TOP_LEVEL_NAVIGATION_ONLY=1 "
+    else:
+        cmd = "do_rest_route"
+        prefix = ""
+
+    object_name = route + (" (admin)" if become_admin else "")
     command_results += fuzz_command(
-        f"php /fuzzer/execute/do_rest_route.php '{route}'",
+        f"{prefix} php /fuzzer/execute/{cmd}.php '{route}'",
         payload_id,
-        route,
+        object_name,
     )
 
 print(json.dumps(command_results))
