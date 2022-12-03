@@ -49,9 +49,11 @@ else
         /var/www/html/wp-includes/pluggable.php
     sed -i '/^function wp_insert_user(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "wp_insert_user", "data" => $userdata)) . "__ENDGARLIC__\\n");' \
         /var/www/html/wp-includes/user.php
-    sed -i '/^function get_users(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "get_users", "data" => $args)) . "__ENDGARLIC__\\n");' \
+    sed -i '/^function wp_update_user(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "wp_update_user", "data" => $userdata)) . "__ENDGARLIC__\\n");' \
         /var/www/html/wp-includes/user.php
     sed -i '/^function wp_delete_user(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "wp_delete_user", "data" => array("id"=>$id))) . "__ENDGARLIC__\\n");' \
+        /var/www/html/wp-includes/user.php
+    sed -i '/^function get_users(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "get_users", "data" => $args)) . "__ENDGARLIC__\\n");' \
         /var/www/html/wp-includes/user.php
     sed -i '/^function update_user_meta(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "update_user_meta", "data" => array("user_id"=>$user_id, "meta_key"=>$meta_key, "meta_value"=>$meta_value))) . "__ENDGARLIC__\\n");' \
         /var/www/html/wp-includes/user.php
