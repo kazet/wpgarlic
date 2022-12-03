@@ -6,6 +6,7 @@ define('DOING_AJAX', true);
 define('WP_ADMIN', true);
 
 include("/fuzzer/magic_payloads.php");
+include("/fuzzer/user.php");
 include("/fuzzer/set_admin.php");
 include('/var/www/html/wp-load.php');
 
