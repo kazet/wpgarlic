@@ -13,7 +13,7 @@ class CrashDetectorTest(unittest.TestCase):
 
     @staticmethod
     def tearDownClass():
-        subprocess.call(["docker-compose", "stop"])
+        subprocess.call(["docker", "compose", "stop"])
 
     @staticmethod
     def assertAnyMatcherWouldDetect(output: bytes):

@@ -14,7 +14,7 @@ class FuzzerInterceptTest(unittest.TestCase):
 
     @staticmethod
     def tearDownClass():
-        subprocess.call(["docker-compose", "stop"])
+        subprocess.call(["docker", "compose", "stop"])
 
     @staticmethod
     def _clean(s: str):

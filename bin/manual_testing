@@ -11,11 +11,11 @@ if [[ "$1" == *.zip ]] && [ -s "$1" ]; then
     file_name=$(basename "$1")
 fi
 
-docker-compose -f docker-compose.manual-testing.yml stop
-docker-compose -f docker-compose.manual-testing.yml rm -f
-docker-compose -f docker-compose.manual-testing.yml build
-docker-compose -f docker-compose.manual-testing.yml up -d
-docker-compose -f docker-compose.manual-testing.yml exec wordpress2 bash -c \
+docker compose -f docker-compose.manual-testing.yml stop
+docker compose -f docker-compose.manual-testing.yml rm -f
+docker compose -f docker-compose.manual-testing.yml build
+docker compose -f docker-compose.manual-testing.yml up -d
+docker compose -f docker-compose.manual-testing.yml exec wordpress2 bash -c \
     "/wait-for-it/wait-for-it.sh db2:3306 --timeout=100 -- mysql --host=db2 -u wordpress --password=wordpress wordpress < /fuzzer/dump.sql"
 
 if [ -z "$file_name" ]; then
@@ -29,6 +29,6 @@ if [ ! -z "$2" ]; then
     parameters="$parameters --version=$2"
 fi
 
-docker-compose -f docker-compose.manual-testing.yml exec wordpress2 bash -c \
+docker compose -f docker-compose.manual-testing.yml exec wordpress2 bash -c \
     "php.orig /wp-cli.phar --allow-root plugin install --activate $parameters < /dev/null"
-docker-compose -f docker-compose.manual-testing.yml exec wordpress2 bash
+docker compose -f docker-compose.manual-testing.yml exec wordpress2 bash

@@ -17,7 +17,7 @@
   timer_start();
 --- 65,74 ----
 ***************
-*** 461,473 ****
+*** 480,492 ****
   do_action( 'plugins_loaded' );
   
   // Define constants which affect functionality if not already defined.
@@ -31,4 +31,4 @@
    *
    * @since 2.0.11
    */
---- 458,467 ----
+--- 477,486 ----

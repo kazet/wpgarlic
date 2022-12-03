@@ -12,7 +12,8 @@ from nonces_storage import get_valid_nonces_for_plugin
 def _run_in_container(cmd: typing.List[str]) -> None:
     subprocess.call(
         [
-            "docker-compose",
+            "docker",
+            "compose",
             "exec",
             "-T",
             "wordpress1",
@@ -52,7 +53,8 @@ def copy_nonces_into_container(plugin_name: str) -> None:
 def run_in_container_and_get_output(cmd: typing.List[str]) -> bytes:
     return subprocess.check_output(
         [
-            "docker-compose",
+            "docker",
+            "compose",
             "exec",
             "-T",
             "wordpress1",
@@ -134,7 +136,8 @@ def patch_plugins(reverse: bool = False) -> None:
 def get_container_id() -> bytes:
     return subprocess.check_output(
         [
-            "docker-compose",
+            "docker",
+            "compose",
             "ps",
             "-q",
             "wordpress1",
@@ -177,14 +180,16 @@ def visit_admin_homepage() -> None:
 def reinitialize_containers():
     subprocess.call(
         [
-            "docker-compose",
+            "docker",
+            "compose",
             "stop",
         ],
         stderr=subprocess.DEVNULL,
     )
     subprocess.call(
         [
-            "docker-compose",
+            "docker",
+            "compose",
             "rm",
             "-f",
             "-v",
@@ -195,13 +200,15 @@ def reinitialize_containers():
     )
     subprocess.call(
         [
-            "docker-compose",
+            "docker",
+            "compose",
             "build",
         ]
     )
     subprocess.call(
         [
-            "docker-compose",
+            "docker",
+            "compose",
             "up",
             "-d",
         ]

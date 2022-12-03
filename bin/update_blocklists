@@ -3,7 +3,7 @@
 cd "$(dirname "$0")/.."
 
 function run_docker_compose {
-    docker-compose -f docker-compose.update-blocklists.yml "$@"
+    docker compose -f docker-compose.update-blocklists.yml "$@"
 }
 
 function exec {

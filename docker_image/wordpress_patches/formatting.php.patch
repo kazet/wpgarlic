@@ -1,7 +1,7 @@
 *** formatting.php.orig	Fri Jul  8 18:42:09 2022
 --- /var/www/html/wp-includes/formatting.php	Fri Jul  8 18:42:15 2022
 ***************
-*** 4360,4377 ****
+*** 4370,4387 ****
    *                those in `$protocols`, or if `$url` contains an empty string.
    */
   function esc_url( $url, $protocols = null, $_context = 'display' ) {
@@ -20,7 +20,7 @@
   
   	if ( 0 !== stripos( $url, 'mailto:' ) ) {
   		$strip = array( '%0d', '%0a', '%0D', '%0A' );
---- 4360,4377 ----
+--- 4370,4387 ----
    *                those in `$protocols`, or if `$url` contains an empty string.
    */
   function esc_url( $url, $protocols = null, $_context = 'display' ) {

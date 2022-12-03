@@ -9,7 +9,7 @@ if [ "$1" == '--reverse' ]; then
     cp /var/www/html/wp-includes/functions.php.orig /var/www/html/wp-includes/functions.php
     cp /var/www/html/wp-includes/pluggable.php.orig /var/www/html/wp-includes/pluggable.php
     cp /var/www/html/wp-includes/user.php.orig /var/www/html/wp-includes/user.php
-    cp /var/www/html/wp-includes/wp-db.php.orig /var/www/html/wp-includes/wp-db.php
+    cp /var/www/html/wp-includes/class-wpdb.php.orig /var/www/html/wp-includes/class-wpdb.php
 else
     cp /var/www/html/wp-includes/formatting.php /var/www/html/wp-includes/formatting.php.orig
     cp /var/www/html/wp-settings.php /var/www/html/wp-settings.php.orig
@@ -19,7 +19,7 @@ else
     cp /var/www/html/wp-includes/functions.php /var/www/html/wp-includes/functions.php.orig
     cp /var/www/html/wp-includes/pluggable.php /var/www/html/wp-includes/pluggable.php.orig
     cp /var/www/html/wp-includes/user.php /var/www/html/wp-includes/user.php.orig
-    cp /var/www/html/wp-includes/wp-db.php /var/www/html/wp-includes/wp-db.php.orig
+    cp /var/www/html/wp-includes/class-wpdb.php /var/www/html/wp-includes/class-wpdb.php.orig
 
     sed -i '/^function update_option(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "update_option", "data" => array("name" => $option, "value" => print_r($value, true)))) . "__ENDGARLIC__\\n");' \
         /var/www/html/wp-includes/option.php
@@ -58,7 +58,7 @@ else
     sed -i '/^function update_user_meta(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "update_user_meta", "data" => array("user_id"=>$user_id, "meta_key"=>$meta_key, "meta_value"=>$meta_value))) . "__ENDGARLIC__\\n");' \
         /var/www/html/wp-includes/user.php
     sed -i '/^\s*public function query(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "query", "data" => $query)) . "__ENDGARLIC__\\n");' \
-        /var/www/html/wp-includes/wp-db.php
+        /var/www/html/wp-includes/class-wpdb.php
 
     patch /var/www/html/wp-settings.php /fuzzer/wordpress_patches/wp-settings.php.patch
     patch /var/www/html/wp-load.php /fuzzer/wordpress_patches/wp-load.php.patch
