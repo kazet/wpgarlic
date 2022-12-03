@@ -126,7 +126,6 @@ class MagicPayloadDictionary implements JsonSerializable {
             $key,
             array(
                 "wp_screen_options",
-                "_ajax_nonce",
                 "_locale",
                 "_jsonp",
                 "_wp_http_referer",
