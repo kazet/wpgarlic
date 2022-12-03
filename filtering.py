@@ -7,6 +7,12 @@ def is_call_interesting(call: dict, in_admin: bool):
         # arbitrary options
         return "GARLIC" in call["data"]["name"]
 
+    if call["what"] in ["update_post_meta"]:
+        return True
+
+    if call["what"] in ["update_user_meta"]:
+        return True
+
     if call["what"] in ["wp_insert_post"]:
         return "GARLIC" in str(call)
 

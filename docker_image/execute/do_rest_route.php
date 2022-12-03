@@ -65,6 +65,18 @@ class Fake_WP_REST_Request extends WP_REST_Request {
             "__ENDGARLIC__");
     }
 
+    public function get_header($key) {
+        return $this->headers[$key];
+    }
+
+    public function get_header_as_array($key) {
+        return $this->headers[$key];
+    }
+
+    public function get_headers() {
+        return $this->headers;
+    }
+
     public function is_json_content_type() {
         return rand() % 2;
     }

@@ -72,6 +72,30 @@ class FuzzerE2ETest(unittest.TestCase):
         )
         self._assert_any_of_expected_strings_in_output(output_path, expected_strings)
 
+    def _fuzz_rest_route_and_check_expected_strings(
+        self,
+        plugin: str,
+        version_or_revision_args: typing.List[str],
+        rest_route: str,
+        expected_strings: typing.List[str],
+    ):
+        output_path = tempfile.mkdtemp()
+        subprocess.call(
+            [
+                "./bin/fuzz_plugin",
+                plugin,
+                "--skip-fuzzing-second-time-without-dependencies",
+                "--enabled-features",
+                "rest_routes",
+                "--rest-routes-to-fuzz",
+                rest_route,
+                "--output-path",
+                output_path,
+            ]
+            + version_or_revision_args
+        )
+        self._assert_any_of_expected_strings_in_output(output_path, expected_strings)
+
     def _fuzz_action_and_check_expected_strings(
         self,
         plugin: str,
@@ -220,6 +244,18 @@ class FuzzerE2ETest(unittest.TestCase):
             [
                 "Call: wp_mail arguments={'to': ",
             ],
+        )
+
+    @retry()
+    def test_CVE_2021_34641(self):
+        # Test that the fuzzer would detect
+        # unauthorized post metadata update in wp-seopress
+        # https://nvd.nist.gov/vuln/detail/CVE-2021-34641
+        self._fuzz_rest_route_and_check_expected_strings(
+            "wp-seopress",
+            ["--version", "5.0.3"],
+            '/seopress/v1/posts/(?P<id>\d+)/title-description-metas@1',
+            ["Call: update_post_meta arguments={"]
         )
 
     @retry()
