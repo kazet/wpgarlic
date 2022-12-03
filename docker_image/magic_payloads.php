@@ -4,6 +4,16 @@ include("/fuzzer/functions.php");
 
 $_garlic_found_nonces = explode("\n", file_get_contents("/fuzzer/valid_nonces.txt"));
 
+/* Here, we explicitely want this handler to fire when using the @ operator - but just not
+ * to pollute the stdout. */
+function handler($errno, $errstr, $errfile, $errline, $errcontext) {
+    fwrite(STDERR, $errstr);
+    return false;
+}
+
+set_error_handler("handler");
+
+
 $payloads = array(
     "legitimateGARLIC",
     # The following two payloads are repeated on purpose to increase

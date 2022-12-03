@@ -76,3 +76,9 @@ class CrashDetectorTest(unittest.TestCase):
             ]
         )
         self.assertAnyMatcherWouldDetect(output)
+
+    def test_error_silencing_is_detected(self):
+        output = run_in_container_and_get_output(
+            ["bash", "-c", 'php -r \'include("/fuzzer/magic_payloads.php"); @file_get_contents("GARLIC");\' 2>&1']
+        )
+        self.assertAnyMatcherWouldDetect(output)
