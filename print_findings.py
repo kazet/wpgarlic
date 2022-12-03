@@ -1,3 +1,4 @@
+import random
 import binascii
 import json
 import os
@@ -55,9 +56,9 @@ class FindingsPrinter:
             intercepted_variables_info.append(
                 "May as well be equal: "
                 + binascii.unhexlify(match.group(1)).decode("ascii", "ignore")
-                + " and "
-                + binascii.unhexlify(match.group(2)).decode("ascii", "ignore")
-            )
+               + " and "
+               + binascii.unhexlify(match.group(2)).decode("ascii", "ignore")
+           )
 
         call_matches = list(fuzzer_output_regexes.CALL_RE.finditer(output))
         header_matches = list(fuzzer_output_regexes.HEADER_RE.finditer(output))
@@ -67,19 +68,22 @@ class FindingsPrinter:
         output = re.sub(fuzzer_output_regexes.COULD_AS_WELL_BE_EQUAL_RE, "", output)
         output = re.sub(fuzzer_output_regexes.CALL_RE, "", output)
         output = re.sub(fuzzer_output_regexes.HEADER_RE, "", output)
-        output = filtering.filter_false_positives(output, file_or_action, fuzzer_output_path)
+        output = filtering.filter_false_positives(
+            output, file_or_action, fuzzer_output_path
+        )
 
-        lcontext = 100
-        rcontext = 300
+        lcontext = 300
+        rcontext = 500
         max_match_size = 100
-        # If we are in admin panel, the fact that someone can see e-mails or file names
+        # If we are in admin panel or user profile, the fact that someone can see e-mails or file names
         # is nothing interesting, therefore we don't report this.
-        in_admin = (
+        in_admin_or_profile = (
             file_or_action.startswith("menu:")
             or file_or_action == "ADMIN OUTPUT"
             or file_or_action.endswith(" (admin)")
+            or '/var/www/html/wp-admin/profile.php' in file_or_action
         )
-        matchers = crash_detector.get_matchers(in_admin)
+        matchers = crash_detector.get_matchers(in_admin_or_profile)
         to_print = []
 
         while True:
@@ -117,12 +121,15 @@ class FindingsPrinter:
 
         for match in header_matches:
             header = binascii.unhexlify(match.group(1)).decode("ascii", "ignore")
-            if filtering.is_header_interesting(header):
+
+            if filtering.is_header_interesting(header, fuzzer_output_path):
                 to_print.append(f"Header: {header}")
 
         for match in call_matches:
             call_information = json.loads(match.group(1))
-            if filtering.is_call_interesting(call_information, in_admin, fuzzer_output_path):
+            if filtering.is_call_interesting(
+                call_information, in_admin_or_profile, fuzzer_output_path, file_or_action
+            ):
                 to_print.append(
                     f"Call: {call_information['what']} arguments={call_information['data']}"
                 )
@@ -189,7 +196,6 @@ def print_findings_from_folder(
             )
         )
     )
-
     num_paths_with_printed_reports = 0
 
     use_console_features = sys.stdout.isatty()

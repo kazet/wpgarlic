@@ -6,23 +6,27 @@ except ImportError:
     filtering_custom = None
 
 
-def is_call_interesting(call: dict, in_admin: bool, fuzzer_output_path: str):
+def is_call_interesting(call: dict, in_admin_or_profile: bool, fuzzer_output_path: str, file_or_action: str):
     if filtering_custom:
-        if filtering_custom.filter_call(call, in_admin, fuzzer_output_path):
+        if filtering_custom.filter_call(call, in_admin_or_profile, fuzzer_output_path, file_or_action):
             return False
 
     if call["what"] in ["delete_option", "delete_site_option"]:
+        if call['data']['name'].startswith('_transient_'):
+            return False
         # For now, let's take into account only the possibility to delete
         # arbitrary options
         return "GARLIC" in call["data"]["name"]
 
-    if call["what"] in ["wp_delete_user"]:
+    if call["what"] in ["wp_delete_user", "wp_update_user"]:
         return True
 
     if call["what"] in ["update_post_meta"]:
-        return True
+        return "GARLIC" in str(call)
 
     if call["what"] in ["update_user_meta"]:
+        if call["data"]["meta_key"] == "wc_last_active":
+            return False
         return True
 
     if call["what"] in ["wp_insert_post"]:
@@ -44,6 +48,8 @@ def is_call_interesting(call: dict, in_admin: bool, fuzzer_output_path: str):
             "fs_accounts",
             "jetpack_connection_xmlrpc_errors",
             "jetpack_connection_xmlrpc_verified_errors",
+            "wpins_block_notice",
+            "wpins_allow_tracking",
         ]:
             return False
 
@@ -75,7 +81,7 @@ def is_call_interesting(call: dict, in_admin: bool, fuzzer_output_path: str):
         else:
             return False
 
-    if call["what"] == "get_users" and in_admin:
+    if call["what"] == "get_users" and in_admin_or_profile:
         # There is nothing interesting that get_users() is called on a page or endpoint
         # with admin privileges
         return False
@@ -104,8 +110,12 @@ def is_call_interesting(call: dict, in_admin: bool, fuzzer_output_path: str):
     return True
 
 
-def is_header_interesting(header: str):
+def is_header_interesting(header: str, fuzzer_output_path: str):
     header = header.lower()
+
+    if filtering_custom:
+        if filtering_custom.filter_header(header, fuzzer_output_path):
+            return False
 
     if (
         header.startswith("location")
@@ -228,6 +238,18 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
         flags=re.M,
     )
     output = re.sub(
+        "Fatal error: Uncaught Exception: DateTime::__construct\\(\\): Failed to parse time string " + SHORT_STRING + " at position",
+        "--false-positive--",
+        output,
+        flags=re.M,
+    )
+    output = re.sub(
+        "doesn't exist for query " + SHORT_STRING + "made by",
+        "--false-positive--",
+        output,
+        flags=re.M,
+    )
+    output = re.sub(
         "Warning: Illegal string offset '"
         + SHORT_STRING
         + "' in /var/www/html/wp-content",
@@ -260,6 +282,13 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
         "confirm your email by clicking on the link we sent to fuzzer@example.com. "
         "This makes sure youre not a bot",
         "--false-positive--",
+    )
+
+    output = re.sub(
+        r"__GARLIC_NONCE__.{0,300}?__ENDGARLIC__",
+        "",
+        output,
+        flags=re.M,
     )
 
     output = re.sub(

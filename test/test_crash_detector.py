@@ -18,7 +18,7 @@ class CrashDetectorTest(unittest.TestCase):
     @staticmethod
     def assertAnyMatcherWouldDetect(output: bytes):
         output = output.decode("utf-8")
-        for matcher in crash_detector.get_matchers(in_admin=False):
+        for matcher in crash_detector.get_matchers(in_admin_or_profile=False):
             match = re.search(matcher, output)
             if match:
                 return
@@ -52,6 +52,12 @@ class CrashDetectorTest(unittest.TestCase):
     def test_libxml_crashes_are_detected(self):
         output = run_in_container_and_get_output(
             ["php", "-r", 'simplexml_load_string("BAD XML");']
+        )
+        self.assertAnyMatcherWouldDetect(output)
+
+    def test_file_write_crashes_are_detected(self):
+        output = run_in_container_and_get_output(
+            ["php", "-r", 'file_put_contents("invalidfolderGARLIC/filenameGARLIC", "test");']
         )
         self.assertAnyMatcherWouldDetect(output)
 
