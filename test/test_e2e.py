@@ -437,7 +437,7 @@ class FuzzerE2ETest(unittest.TestCase):
                 "--version",
                 "6.66",
                 "--enabled-features",
-                "pages",
+                "pages_not_logged_in",
                 "--output-path",
                 output_path,
             ]
@@ -475,7 +475,7 @@ class FuzzerE2ETest(unittest.TestCase):
             [
                 "./bin/fuzz_plugin",
                 "user-private-files",
-                "--enabled-features actions,pages",
+                "--enabled-features actions,pages_not_logged_in",
                 "--actions-to-fuzz",
                 "wp_ajax_upload_doc_callback",
                 "--version",
@@ -488,7 +488,7 @@ class FuzzerE2ETest(unittest.TestCase):
             [
                 "./bin/fuzz_plugin",
                 "user-private-files",
-                "--enabled-features actions,pages",
+                "--enabled-features actions,pages_not_logged_in",
                 "--actions-to-fuzz",
                 "wp_ajax_upload_doc_callback",
                 "--version",
