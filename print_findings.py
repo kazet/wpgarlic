@@ -67,7 +67,7 @@ class FindingsPrinter:
         output = re.sub(fuzzer_output_regexes.COULD_AS_WELL_BE_EQUAL_RE, "", output)
         output = re.sub(fuzzer_output_regexes.CALL_RE, "", output)
         output = re.sub(fuzzer_output_regexes.HEADER_RE, "", output)
-        output = filtering.filter_false_positives(output, file_or_action)
+        output = filtering.filter_false_positives(output, file_or_action, fuzzer_output_path)
 
         lcontext = 100
         rcontext = 300
@@ -122,7 +122,7 @@ class FindingsPrinter:
 
         for match in call_matches:
             call_information = json.loads(match.group(1))
-            if filtering.is_call_interesting(call_information, in_admin):
+            if filtering.is_call_interesting(call_information, in_admin, fuzzer_output_path):
                 to_print.append(
                     f"Call: {call_information['what']} arguments={call_information['data']}"
                 )

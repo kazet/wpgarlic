@@ -1,7 +1,16 @@
 import re
 
+try:
+    import filtering_custom
+except ImportError:
+    filtering_custom = None
 
-def is_call_interesting(call: dict, in_admin: bool):
+
+def is_call_interesting(call: dict, in_admin: bool, fuzzer_output_path: str):
+    if filtering_custom:
+        if filtering_custom.filter_call(call, in_admin, fuzzer_output_path):
+            return False
+
     if call["what"] in ["delete_option", "delete_site_option"]:
         # For now, let's take into account only the possibility to delete
         # arbitrary options
@@ -35,6 +44,7 @@ def is_call_interesting(call: dict, in_admin: bool):
         ]:
             return False
 
+        call["data"]["name"] = str(call["data"]["name"])
         if call["data"]["name"].startswith("_transient_timeout_"):
             return False
 
@@ -106,7 +116,7 @@ def is_header_interesting(header: str):
     return False
 
 
-def filter_false_positives(output: str, endpoint: str) -> str:
+def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) -> str:
     SHORT_STRING = "(.|\n){1,256}?"
 
     output = re.sub(
@@ -252,5 +262,10 @@ def filter_false_positives(output: str, endpoint: str) -> str:
         output,
         flags=re.M,
     )
+
+    if filtering_custom:
+        output = filtering_custom.filter_false_positives(
+            output, endpoint, fuzzer_output_path
+        )
 
     return output
