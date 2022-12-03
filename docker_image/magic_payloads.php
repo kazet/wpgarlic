@@ -2,6 +2,8 @@
 
 include("/fuzzer/functions.php");
 
+$_garlic_found_nonces = explode("\n", file_get_contents("/fuzzer/valid_nonces.txt"));
+
 $payloads = array(
     "legitimateGARLIC",
     # The following two payloads are repeated on purpose to increase

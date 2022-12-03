@@ -459,3 +459,42 @@ class FuzzerE2ETest(unittest.TestCase):
             "/var/www/html/wp-content/plugins/webp-converter-for-media/includes/passthru.php",
             expected_strings,
         )
+
+    @retry()
+    def test_CVE_2022_2356(self):
+        # Test that the fuzzer would detect arbitrary file upload in user-private-files
+        # https://wpscan.com/vulnerability/67f3948e-27d4-47a8-8572-616143b9cf43
+        expected_strings = [
+            "__GARLIC_ACCESSED__ _FILES[docfile] __ENDGARLIC__",
+        ]
+        nonces_path = tempfile.mktemp()
+        os.environ["NONCE_FILENAME_OVERRIDE"] = nonces_path
+
+        output_path = tempfile.mkdtemp()
+        subprocess.call(
+            [
+                "./bin/fuzz_plugin",
+                "user-private-files",
+                "--enabled-features actions,pages",
+                "--actions-to-fuzz",
+                "wp_ajax_upload_doc_callback",
+                "--version",
+                "1.1.2",
+                "--output-path",
+                output_path,
+            ]
+        )
+        subprocess.call(
+            [
+                "./bin/fuzz_plugin",
+                "user-private-files",
+                "--enabled-features actions,pages",
+                "--actions-to-fuzz",
+                "wp_ajax_upload_doc_callback",
+                "--version",
+                "1.1.2",
+                "--output-path",
+                output_path,
+            ]
+        )
+        self._assert_any_of_expected_strings_in_output(output_path, expected_strings)

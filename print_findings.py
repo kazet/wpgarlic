@@ -180,11 +180,13 @@ def print_findings_from_folder(
         ]
 
     file_names = list(
-        sorted(
-            file_names,
-            key=lambda file_name: os.path.getmtime(
-                os.path.join(output_folder, file_name)
-            ),
+        reversed(
+            sorted(
+                file_names,
+                key=lambda file_name: os.path.getmtime(
+                    os.path.join(output_folder, file_name)
+                ),
+            )
         )
     )
 

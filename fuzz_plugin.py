@@ -10,6 +10,7 @@ import typer
 
 import config
 from fuzzer_container import *
+from nonces_storage import collect_nonces
 
 
 def get_dependencies(slug: str, description: str) -> List[str]:
@@ -117,6 +118,7 @@ def fuzz_plugin(
             for i in range(3):
                 visit_admin_homepage()
 
+            copy_nonces_into_container(slug)
             patch_wordpress()
             patch_plugins()
 
@@ -162,7 +164,7 @@ def fuzz_plugin(
                         command_results += fuzz_pages("RANDOM")
                     else:
                         assert False
-                except Exception as e:
+                except ValueError as e:
                     print("Error", e)
                     continue
 
@@ -183,6 +185,8 @@ def fuzz_plugin(
 
             if "find_in_admin_after_fuzzing" in enabled_features:
                 command_results += find_payloads_in_admin()
+
+            collect_nonces(slug, command_results)
 
             output = {
                 "version": version,

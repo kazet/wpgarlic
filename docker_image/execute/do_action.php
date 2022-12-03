@@ -14,7 +14,7 @@ reinitialize_magic();
 
 do_action( 'admin_init' );
 
-if (strstr($_garlic_the_action, '_nopriv_') !== false) {
+if (strstr($_garlic_the_action, '_nopriv_') === false) {
     wp_set_current_user(2, "subscriber");
 }
 

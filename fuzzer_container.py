@@ -1,9 +1,12 @@
 import json
 import subprocess
+import tempfile
 import time
 import typing
 from os.path import basename
 from zipfile import ZipFile
+
+from nonces_storage import get_valid_nonces_for_plugin
 
 
 def _run_in_container(cmd: typing.List[str]) -> None:
@@ -35,6 +38,15 @@ def _copy_plugin_into_container(file_path: str) -> str:
     new_file_path = f"/fuzzer/plugin_{file_name}"
     subprocess.call(["docker", "cp", file_path, f"wordpress1:{new_file_path}"])
     return new_file_path
+
+
+def copy_nonces_into_container(plugin_name: str) -> None:
+    nonces = get_valid_nonces_for_plugin(plugin_name)
+    with tempfile.NamedTemporaryFile() as f:
+        f.write("\n".join(nonces).encode("utf-8"))
+        f.flush()
+        new_file_path = "/fuzzer/valid_nonces.txt"
+        subprocess.call(["docker", "cp", f.name, f"wordpress1:{new_file_path}"])
 
 
 def run_in_container_and_get_output(cmd: typing.List[str]) -> bytes:
