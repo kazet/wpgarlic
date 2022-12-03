@@ -108,6 +108,9 @@ def is_header_interesting(header: str):
         header.startswith("location")
         and not header.startswith("location: https://127.0.0.1:8001/")
         and not header.startswith("location: http://127.0.0.1:8001/")
+        and not header.startswith("location: https://:8001/")
+        and not header.startswith("location: http://:8001/")
+        and not header.startswith("location: https://elementor.com/pro/")
         and not header.startswith("location: ?")
         and "garlic" in header
     ):
