@@ -11,6 +11,7 @@ def get_matchers(
         # [^_D]GARLIC is to exclude __GARLIC and __ENDGARLIC
         re.compile("require\\(.{0,256}[^_D]GARLIC", flags),
         re.compile("include\\(.{0,256}[^_D]GARLIC", flags),
+        re.compile("readfile\\(.{0,256}[^_D]GARLIC", flags),
         re.compile("require_once\\(.{0,256}[^_D]GARLIC", flags),
         re.compile("include_once\\(.{0,256}[^_D]GARLIC", flags),
         re.compile("file_get_contents{0,256}GARLIC", flags),
