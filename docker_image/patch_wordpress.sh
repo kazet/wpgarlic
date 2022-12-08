@@ -43,7 +43,7 @@ else
         /var/www/html/wp-includes/pluggable.php
     # These are nonces that are easy to obtain (wp_rest and when the action is user-controlled), therefore
     # let's treat is as correct nonce.
-    sed -i '/^\s*function wp_create_nonce(/a return "__GARLIC_NONCE__" . $action . "__ENDGARLIC__"; ' \
+    sed -i '/^\s*function wp_create_nonce(/a return "__GARLIC_NONCE__" . $action . "__ENDNONCEGARLIC__"; ' \
         /var/www/html/wp-includes/pluggable.php
     sed -i '/^\s*function wp_verify_nonce(/a global $_garlic_found_nonces; if ($action == "wp_rest" || strstr($action, "GARLIC") > 0 || in_array($action, $_garlic_found_nonces)) { return 1; }' \
         /var/www/html/wp-includes/pluggable.php

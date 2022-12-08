@@ -4,7 +4,7 @@ import re
 import subprocess
 import typing
 
-NONCE_RE = re.compile("__GARLIC_NONCE__(.*?)__ENDGARLIC__")
+NONCE_RE = re.compile("__GARLIC_NONCE__(.*?)__ENDNONCEGARLIC__")
 
 # We add hostname to the nonce filename to decrease the chance of overriding when rsyncing
 NONCE_FILENAME = os.environ.get(

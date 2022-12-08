@@ -292,7 +292,7 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
     )
 
     output = re.sub(
-        r"__GARLIC_NONCE__.{0,300}?__ENDGARLIC__",
+        r"__GARLIC_NONCE__.{0,300}?__ENDNONCEGARLIC__",
         "",
         output,
         flags=re.M,
