@@ -11,6 +11,9 @@
 /elementor/v1/favorites@0
 /elementor/v1/favorites/(?P<id>[\w]+)@0
 /elementor/v1/favorites/(?P<id>[\w]+)@1
+/elementor/v1/kit-elements-defaults@0
+/elementor/v1/kit-elements-defaults/(?P<type>[\w\-\_]+)@0
+/elementor/v1/kit-elements-defaults/(?P<type>[\w\-\_]+)@1
 /elementor/v1/template-library/templates@0
 /elementor/v1/template-library/templates@1
 /elementor/v1/send-event@0

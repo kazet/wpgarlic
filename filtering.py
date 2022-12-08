@@ -52,6 +52,7 @@ def is_call_interesting(
             "fs_accounts",
             "jetpack_connection_xmlrpc_errors",
             "jetpack_connection_xmlrpc_verified_errors",
+            "elementor_log",
             "wpins_block_notice",
             "wpins_allow_tracking",
         ]:

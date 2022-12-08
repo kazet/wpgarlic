@@ -129,10 +129,13 @@
 /wc-analytics/taxes/(?P<id>[\d]+)@1
 /wc-analytics/taxes/(?P<id>[\d]+)@2
 /wc-analytics/taxes/batch@0
+/wc-admin/mobile-app/send-magic-link@0
+/wc-admin/mobile-app@0
 /wc-analytics/customers@0
 /wc-analytics/customers/(?P<id>[\d-]+)@0
 /wc-analytics/leaderboards@0
 /wc-analytics/leaderboards/allowed@0
+/wc-analytics/leaderboards/(?P<leaderboard>\w+)@0
 /wc-analytics/reports@0
 /wc-analytics/reports/import@0
 /wc-analytics/reports/import/cancel@0
