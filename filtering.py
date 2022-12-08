@@ -114,11 +114,11 @@ def is_call_interesting(
     return True
 
 
-def is_header_interesting(header: str, fuzzer_output_path: str):
+def is_header_interesting(header: str, fuzzer_output_path: str, file_or_action: str):
     header = header.lower()
 
     if filtering_custom:
-        if filtering_custom.filter_header(header, fuzzer_output_path):
+        if filtering_custom.filter_header(header, fuzzer_output_path, file_or_action):
             return False
 
     if (
