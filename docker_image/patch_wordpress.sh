@@ -21,6 +21,15 @@ else
     cp /var/www/html/wp-includes/user.php /var/www/html/wp-includes/user.php.orig
     cp /var/www/html/wp-includes/class-wpdb.php /var/www/html/wp-includes/class-wpdb.php.orig
 
+    patch /var/www/html/wp-settings.php /fuzzer/wordpress_patches/wp-settings.php.patch
+    patch /var/www/html/wp-load.php /fuzzer/wordpress_patches/wp-load.php.patch
+
+    # This patch fixes functions so that they doesn't use equality but strcmp. Because equalty is hacked
+    # so that our payloads randomly compare as equal to anything, this caused that URLs sometimes were
+    # returned unescaped or strings were treated as serialized - and led to false positives.
+    patch /var/www/html/wp-includes/formatting.php /fuzzer/wordpress_patches/formatting.php.patch
+    patch /var/www/html/wp-includes/functions.php /fuzzer/wordpress_patches/functions.php.patch
+
     sed -i '/^function update_option(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "update_option", "data" => array("name" => $option, "value" => print_r($value, true)))) . "__ENDGARLIC__\\n");' \
         /var/www/html/wp-includes/option.php
     sed -i '/^function delete_option(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "delete_option", "data" => array("name" => $option))) . "__ENDGARLIC__\\n");' \
@@ -59,12 +68,4 @@ else
         /var/www/html/wp-includes/user.php
     sed -i '/^\s*public function query(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "query", "data" => $query)) . "__ENDGARLIC__\\n");' \
         /var/www/html/wp-includes/class-wpdb.php
-
-    patch /var/www/html/wp-settings.php /fuzzer/wordpress_patches/wp-settings.php.patch
-    patch /var/www/html/wp-load.php /fuzzer/wordpress_patches/wp-load.php.patch
-
-    # This patch fixes esc_url so that it doesn't use equality but strcmp. Because equalty is hacked
-    # so that our payloads randomly compare as equal to anything, this caused that URLs sometimes were
-    # returned unescaped - and led to false positives.
-    patch /var/www/html/wp-includes/formatting.php /fuzzer/wordpress_patches/formatting.php.patch
 fi

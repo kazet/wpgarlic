@@ -1,0 +1,21 @@
+*** wp-includes/functions.php.orig	Fri Dec  9 15:48:33 2022
+--- wp-includes/functions.php	Fri Dec  9 15:49:24 2022
+***************
+*** 674,680 ****
+  		return false;
+  	}
+  	$data = trim( $data );
+! 	if ( 'N;' === $data ) {
+  		return true;
+  	}
+  	if ( strlen( $data ) < 4 ) {
+--- 674,682 ----
+  		return false;
+  	}
+  	$data = trim( $data );
+! 
+! 	/* We use strcmp instead of ===, therefore the wpgarlic mocked equality won't be used */
+! 	if ( !strcmp('N;', $data) ) {
+  		return true;
+  	}
+  	if ( strlen( $data ) < 4 ) {

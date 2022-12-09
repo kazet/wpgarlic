@@ -1,9 +1,7 @@
-*** formatting.php.orig	Fri Jul  8 18:42:09 2022
---- /var/www/html/wp-includes/formatting.php	Fri Jul  8 18:42:15 2022
+*** wp-includes/formatting.php.orig	Fri Dec  9 15:48:21 2022
+--- wp-includes/formatting.php	Fri Dec  9 15:49:39 2022
 ***************
-*** 4370,4387 ****
-   *                those in `$protocols`, or if `$url` contains an empty string.
-   */
+*** 4372,4385 ****
   function esc_url( $url, $protocols = null, $_context = 'display' ) {
   	$original_url = $url;
   
@@ -18,14 +16,11 @@
   		return $url;
   	}
   
-  	if ( 0 !== stripos( $url, 'mailto:' ) ) {
-  		$strip = array( '%0d', '%0a', '%0D', '%0A' );
---- 4370,4387 ----
-   *                those in `$protocols`, or if `$url` contains an empty string.
-   */
+--- 4372,4387 ----
   function esc_url( $url, $protocols = null, $_context = 'display' ) {
   	$original_url = $url;
   
+! 	/* We use strcmp instead of ===, therefore the wpgarlic mocked equality won't be used */
 ! 	if (!strcmp('', $url)) {
   		return $url;
   	}
@@ -33,9 +28,8 @@
   	$url = str_replace( ' ', '%20', ltrim( $url ) );
   	$url = preg_replace( '|[^a-z0-9-~+_.?#=!&;,/:%@$\|*\'()\[\]\\x80-\\xff]|i', '', $url );
   
+! 	/* We use strcmp instead of ===, therefore the wpgarlic mocked equality won't be used */
 ! 	if (!strcmp('', $url)) {
   		return $url;
   	}
   
-  	if ( 0 !== stripos( $url, 'mailto:' ) ) {
-  		$strip = array( '%0d', '%0a', '%0D', '%0A' );
