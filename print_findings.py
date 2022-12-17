@@ -121,7 +121,9 @@ class FindingsPrinter:
         for match in header_matches:
             header = binascii.unhexlify(match.group(1)).decode("ascii", "ignore")
 
-            if filtering.is_header_interesting(header, fuzzer_output_path, file_or_action):
+            if filtering.is_header_interesting(
+                header, fuzzer_output_path, file_or_action
+            ):
                 to_print.append(f"Header: {header}")
 
         for match in call_matches:
@@ -198,7 +200,7 @@ def print_findings_from_folder(
             )
         )
     )
- 
+
     num_paths_with_printed_reports = 0
 
     use_console_features = sys.stdout.isatty()
