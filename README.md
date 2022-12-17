@@ -1,7 +1,7 @@
 # wpgarlic
 A proof-of-concept WordPress plugin fuzzer used in the research described in
 https://kazet.cc/2022/02/03/fuzzing-wordpress-plugins.html that helped to discover
-more than 140 vulnerablities in WordPress plugins installed on almost 15 million
+more than 170 vulnerablities in WordPress plugins installed on almost 15 million
 sites.
 
 If you want to continue the research, start with less popular plugins - if a plugin
