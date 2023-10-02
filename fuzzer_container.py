@@ -217,6 +217,7 @@ def reinitialize_containers():
         ["/wait-for-it/wait-for-it.sh", "-h", "db1", "-p", "3306", "-t", "0"]
     )
     time.sleep(2)
+    _run_in_container(["chown", "-R", "www-data:www-data", "/var/www/html"])
     _run_in_container(["/fuzzer/create_findable_files.sh"])
     _run_in_container(
         [
@@ -225,6 +226,18 @@ def reinitialize_containers():
             "mysql --host=db1 -u wordpress --password=wordpress wordpress < /fuzzer/dump.sql",
         ]
     )
+    _run_in_container([
+        "php.orig",
+        "/wp-cli.phar",
+        "--allow-root",
+        "core",
+        "update"])
+    _run_in_container([
+        "php.orig",
+        "/wp-cli.phar",
+        "--allow-root",
+        "core",
+        "update-db"])
 
 
 def install_plugin_from_svn(slug: str, revision: str):

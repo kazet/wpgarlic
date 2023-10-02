@@ -1,21 +1,17 @@
-*** wp-includes/functions.php.orig	Fri Dec  9 15:48:33 2022
---- wp-includes/functions.php	Fri Dec  9 15:49:24 2022
-***************
-*** 674,680 ****
-  		return false;
-  	}
-  	$data = trim( $data );
-! 	if ( 'N;' === $data ) {
-  		return true;
-  	}
-  	if ( strlen( $data ) < 4 ) {
---- 674,682 ----
-  		return false;
-  	}
-  	$data = trim( $data );
-! 
-! 	/* We use strcmp instead of ===, therefore the wpgarlic mocked equality won't be used */
-! 	if ( !strcmp('N;', $data) ) {
-  		return true;
-  	}
-  	if ( strlen( $data ) < 4 ) {
+--- /var/www/html/wp-includes/functions.php.orig	2023-10-02 09:45:55.275203991 +0000
++++ /var/www/html/wp-includes/functions.php	2023-10-02 09:52:11.326705095 +0000
+@@ -670,11 +671,13 @@
+ 	// If it isn't a string, it isn't serialized.
+ 	if ( ! is_string( $data ) ) {
+ 		return false;
+ 	}
+ 	$data = trim( $data );
+-	if ( 'N;' === $data ) {
++
++        /* We use strcmp instead of ===, therefore the wpgarlic mocked equality won't be used */
++        if ( !strcmp('N;', $data) ) {
+ 		return true;
+ 	}
+ 	if ( strlen( $data ) < 4 ) {
+ 		return false;
+ 	}
