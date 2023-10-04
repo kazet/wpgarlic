@@ -175,6 +175,9 @@ Fuzzing files (i.e. executing each PHP file with injected payloads) has been dis
 because it didn't lead to many findings. Uncomment `files` in  `config.DEFAULT_ENABLED_FEATURES`
 to change that.
 
+Fuzzing REST routes as logged-in admin has been disabled as it led to false positives.
+Uncomment `rest_routes_admin` in  `config.DEFAULT_ENABLED_FEATURES` to change that.
+
 ## Fuzzer internals
 ### Blocklists
 Some plugins need other ones (e.g. woocommerce) as a dependency. When fuzzing a plugin that has
