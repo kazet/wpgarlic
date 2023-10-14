@@ -1,19 +1,20 @@
 diff --git a/Zend/zend_string.h b/Zend/zend_string.h
-index 96169d9a27..20c05f455e 100644
+index df31a63656..d39393281e 100644
 --- a/Zend/zend_string.h
 +++ b/Zend/zend_string.h
-@@ -20,6 +20,8 @@
- #define ZEND_STRING_H
+@@ -21,6 +21,9 @@
  
  #include "zend.h"
+ 
 +#include <unistd.h>
 +#include <time.h>
- 
++
  BEGIN_EXTERN_C()
  
-@@ -311,7 +313,43 @@ static zend_always_inline zend_bool zend_string_equal_val(zend_string *s1, zend_
+ typedef void (*zend_string_copy_storage_func_t)(void);
+@@ -359,7 +362,43 @@ static zend_always_inline bool zend_string_equal_val(const zend_string *s1, cons
  
- static zend_always_inline zend_bool zend_string_equal_content(zend_string *s1, zend_string *s2)
+ static zend_always_inline bool zend_string_equal_content(const zend_string *s1, const zend_string *s2)
  {
 -	return ZSTR_LEN(s1) == ZSTR_LEN(s2) && zend_string_equal_val(s1, s2);
 +	static int initialized = 0;
@@ -31,8 +32,8 @@ index 96169d9a27..20c05f455e 100644
 +	if (strstr(ZSTR_VAL(s1), "GARLIC") || strstr(ZSTR_VAL(s2), "GARLIC")) {
 +		int rnd = rand() % 3;
 +		if (rnd == 0 && enabled) {
-+			char* s1_val = ZSTR_VAL(s1);
-+			char* s2_val = ZSTR_VAL(s2);
++			const char* s1_val = ZSTR_VAL(s1);
++			const char* s2_val = ZSTR_VAL(s2);
 +			fprintf(
 +				stderr,
 +				"__GARLIC_COULD_AS_WELL_BE_EQUAL__");
@@ -55,82 +56,81 @@ index 96169d9a27..20c05f455e 100644
 +	return 0;
  }
  
- static zend_always_inline zend_bool zend_string_equals(zend_string *s1, zend_string *s2)
+ static zend_always_inline bool zend_string_equals(const zend_string *s1, const zend_string *s2)
 diff --git a/ext/json/json.c b/ext/json/json.c
-index 8474642266..b7fd3a13d5 100644
+index e36746f186..4648b17e6e 100644
 --- a/ext/json/json.c
 +++ b/ext/json/json.c
-@@ -33,7 +33,7 @@
+@@ -232,7 +232,7 @@ PHP_FUNCTION(json_encode)
+ /* }}} */
  
- static PHP_MINFO_FUNCTION(json);
- static PHP_FUNCTION(json_encode);
--static PHP_FUNCTION(json_decode);
-+static PHP_FUNCTION(real_json_decode);
- static PHP_FUNCTION(json_last_error);
- static PHP_FUNCTION(json_last_error_msg);
- 
-@@ -66,7 +66,7 @@ ZEND_END_ARG_INFO()
- /* {{{ json_functions[] */
- static const zend_function_entry json_functions[] = {
- 	PHP_FE(json_encode, arginfo_json_encode)
--	PHP_FE(json_decode, arginfo_json_decode)
-+	PHP_FE(real_json_decode, arginfo_json_decode)
- 	PHP_FE(json_last_error, arginfo_json_last_error)
- 	PHP_FE(json_last_error_msg, arginfo_json_last_error_msg)
- 	PHP_FE_END
-@@ -308,7 +308,7 @@ static PHP_FUNCTION(json_encode)
- 
- /* {{{ proto mixed json_decode(string json [, bool assoc [, int depth]])
-    Decodes the JSON representation into a PHP value */
--static PHP_FUNCTION(json_decode)
-+static PHP_FUNCTION(real_json_decode)
+ /* {{{ Decodes the JSON representation into a PHP value */
+-PHP_FUNCTION(json_decode)
++PHP_FUNCTION(real_json_decode)
  {
  	char *str;
  	size_t str_len;
+diff --git a/ext/json/json_arginfo.h b/ext/json/json_arginfo.h
+index 53a31f542b..96f7fe70ea 100644
+--- a/ext/json/json_arginfo.h
++++ b/ext/json/json_arginfo.h
+@@ -25,14 +25,14 @@ ZEND_END_ARG_INFO()
+ 
+ 
+ ZEND_FUNCTION(json_encode);
+-ZEND_FUNCTION(json_decode);
++ZEND_FUNCTION(real_json_decode);
+ ZEND_FUNCTION(json_last_error);
+ ZEND_FUNCTION(json_last_error_msg);
+ 
+ 
+ static const zend_function_entry ext_functions[] = {
+ 	ZEND_FE(json_encode, arginfo_json_encode)
+-	ZEND_FE(json_decode, arginfo_json_decode)
++	ZEND_FE(real_json_decode, arginfo_json_decode)
+ 	ZEND_FE(json_last_error, arginfo_json_last_error)
+ 	ZEND_FE(json_last_error_msg, arginfo_json_last_error_msg)
+ 	ZEND_FE_END
 diff --git a/ext/standard/base64.c b/ext/standard/base64.c
-index 0dd4045887..e3820c2ec4 100644
+index 3893438839..5d0ab5b40e 100644
 --- a/ext/standard/base64.c
 +++ b/ext/standard/base64.c
-@@ -943,7 +943,7 @@ PHP_FUNCTION(base64_encode)
+@@ -942,7 +942,7 @@ PHP_FUNCTION(base64_encode)
+ /* }}} */
  
- /* {{{ proto string base64_decode(string str[, bool strict])
-    Decodes string using MIME base64 algorithm */
+ /* {{{ Decodes string using MIME base64 algorithm */
 -PHP_FUNCTION(base64_decode)
 +PHP_FUNCTION(real_base64_decode)
  {
  	char *str;
- 	zend_bool strict = 0;
-diff --git a/ext/standard/base64.h b/ext/standard/base64.h
-index faf245c5d9..f9ba87a077 100644
---- a/ext/standard/base64.h
-+++ b/ext/standard/base64.h
-@@ -59,7 +59,7 @@
-  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  */
- 
--PHP_FUNCTION(base64_decode);
-+PHP_FUNCTION(real_base64_decode);
- PHP_FUNCTION(base64_encode);
- 
- #if (ZEND_INTRIN_AVX2_FUNC_PTR || ZEND_INTRIN_SSSE3_FUNC_PTR) && !ZEND_INTRIN_AVX2_NATIVE
-diff --git a/ext/standard/basic_functions.c b/ext/standard/basic_functions.c
-index 64f27ef5af..b13a7d43e0 100644
---- a/ext/standard/basic_functions.c
-+++ b/ext/standard/basic_functions.c
-@@ -2917,7 +2917,7 @@ static const zend_function_entry basic_functions[] = { /* {{{ */
- 	PHP_FE(getmyinode,														arginfo_getmyinode)
- 	PHP_FE(getlastmod,														arginfo_getlastmod)
- 
--	PHP_FE(base64_decode,													arginfo_base64_decode)
-+	PHP_FE(real_base64_decode,													arginfo_base64_decode)
- 	PHP_FE(base64_encode,													arginfo_base64_encode)
- 
- 	PHP_FE(password_hash,													arginfo_password_hash)
+ 	bool strict = 0;
+diff --git a/ext/standard/basic_functions_arginfo.h b/ext/standard/basic_functions_arginfo.h
+index d7eb83b556..1243c1f085 100644
+--- a/ext/standard/basic_functions_arginfo.h
++++ b/ext/standard/basic_functions_arginfo.h
+@@ -2302,7 +2302,7 @@ ZEND_FUNCTION(array_chunk);
+ ZEND_FUNCTION(array_combine);
+ ZEND_FUNCTION(array_is_list);
+ ZEND_FUNCTION(base64_encode);
+-ZEND_FUNCTION(base64_decode);
++ZEND_FUNCTION(real_base64_decode);
+ ZEND_FUNCTION(constant);
+ ZEND_FUNCTION(ip2long);
+ ZEND_FUNCTION(long2ip);
+@@ -2926,7 +2926,7 @@ static const zend_function_entry ext_functions[] = {
+ 	ZEND_FE(array_combine, arginfo_array_combine)
+ 	ZEND_SUPPORTS_COMPILE_TIME_EVAL_FE(array_is_list, arginfo_array_is_list)
+ 	ZEND_SUPPORTS_COMPILE_TIME_EVAL_FE(base64_encode, arginfo_base64_encode)
+-	ZEND_SUPPORTS_COMPILE_TIME_EVAL_FE(base64_decode, arginfo_base64_decode)
++	ZEND_SUPPORTS_COMPILE_TIME_EVAL_FE(real_base64_decode, arginfo_base64_decode)
+ 	ZEND_FE(constant, arginfo_constant)
+ 	ZEND_FE(ip2long, arginfo_ip2long)
+ 	ZEND_FE(long2ip, arginfo_long2ip)
 diff --git a/ext/standard/php_fopen_wrapper.c b/ext/standard/php_fopen_wrapper.c
-index 295751f0db..14112eab7c 100644
+index 8926485025..83c79d9252 100644
 --- a/ext/standard/php_fopen_wrapper.c
 +++ b/ext/standard/php_fopen_wrapper.c
-@@ -216,34 +216,7 @@ php_stream * php_stream_url_wrap_php(php_stream_wrapper *wrapper, const char *pa
+@@ -214,28 +214,7 @@ php_stream * php_stream_url_wrap_php(php_stream_wrapper *wrapper, const char *pa
  		return php_stream_alloc(&php_stream_output_ops, NULL, 0, "wb");
  	}
  
@@ -156,21 +156,15 @@ index 295751f0db..14112eab7c 100644
 -	}
 -
 -	if (!strcasecmp(path, "stdin")) {
--		if ((options & STREAM_OPEN_FOR_INCLUDE) && !PG(allow_url_include) ) {
--			if (options & REPORT_ERRORS) {
--				php_error_docref(NULL, E_WARNING, "URL file-access is disabled in the server configuration");
--			}
--			return NULL;
--		}
-+	if (!strcasecmp(path, "input") || !strcasecmp(path, "stdin")) {
- 		if (!strcmp(sapi_module.name, "cli")) {
- 			static int cli_in = 0;
- 			fd = STDIN_FILENO;
++    if (!strcasecmp(path, "input") || !strcasecmp(path, "stdin")) {
+ 		if ((options & STREAM_OPEN_FOR_INCLUDE) && !PG(allow_url_include) ) {
+ 			if (options & REPORT_ERRORS) {
+ 				php_error_docref(NULL, E_WARNING, "URL file-access is disabled in the server configuration");
 diff --git a/main/SAPI.c b/main/SAPI.c
-index a5a68f8c68..be4a94183b 100644
+index 09b028e551..4ddd78d5ca 100644
 --- a/main/SAPI.c
 +++ b/main/SAPI.c
-@@ -652,6 +652,19 @@ static void sapi_header_add_op(sapi_header_op_enum op, sapi_header_struct *sapi_
+@@ -660,6 +660,19 @@ static void sapi_header_add_op(sapi_header_op_enum op, sapi_header_struct *sapi_
  
  SAPI_API int sapi_header_op(sapi_header_op_enum op, void *arg)
  {

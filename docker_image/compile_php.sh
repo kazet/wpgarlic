@@ -6,7 +6,7 @@ git clone https://github.com/php/php-src
 
 cd php-src/
 
-git checkout php-7.4.16
+git checkout php-8.2.9
 
 git apply /fuzzer/php_source_patch.patch
 

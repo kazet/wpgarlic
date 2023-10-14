@@ -6,7 +6,7 @@ $_garlic_found_nonces = explode("\n", file_get_contents("/fuzzer/valid_nonces.tx
 
 /* Here, we explicitely want this handler to fire when using the @ operator - but just not
  * to pollute the stdout. */
-function handler($errno, $errstr, $errfile, $errline, $errcontext) {
+function handler($errno, $errstr, $errfile, $errline) {
     fwrite(STDERR, $errstr);
     return false;
 }
@@ -73,7 +73,7 @@ class MagicPayloadDictionary implements JsonSerializable {
         $this->ignore_http_host = $ignore_http_host;
     }
 
-    function jsonSerialize() {
+    function jsonSerialize(): mixed {
         return "(recursively returning magic object)";
     }
 
@@ -264,6 +264,10 @@ class MagicPayloadDictionary implements JsonSerializable {
             $payload = add_magic_quotes_to_payload($payload);
         }
 
+        if (str_starts_with($key, 'HTTP_')) {
+            $payload = strval($payload);
+        }
+
         fwrite(STDERR, '__GARLIC_INTERCEPT__' . json_encode(array(
             'name' => $this->_garlic_name,
             'key' => $key,
@@ -271,6 +275,7 @@ class MagicPayloadDictionary implements JsonSerializable {
         )) . "__ENDGARLIC__\n");
 
         $this->parameters[$key] = $payload;
+
         return $payload;
     }
 
@@ -285,20 +290,19 @@ class MagicArray extends MagicPayloadDictionary implements ArrayAccess, Countabl
         return rand() % 3;
     }
 
-    function offsetSet($offset, $value) {
+    function offsetSet(mixed $offset, mixed $value): void {
         $this->original[$offset] = $value;
-        return $value;
     }
 
-    function offsetExists($offset) {
+    function offsetExists(mixed $offset): bool {
         return $this->getAndSaveForFurtherGets($offset) !== null;
     }
 
-    function offsetUnset($offset) {
+    function offsetUnset(mixed $offset): void {
         $this->original[$offset] = null;
     }
 
-    function offsetGet($offset) {
+    function offsetGet(mixed $offset): mixed {
         return $this->getAndSaveForFurtherGets($offset);
     }
 }
@@ -316,19 +320,19 @@ class AccessLoggingArray implements ArrayAccess {
         $this->_garlic_name = $name;
     }
 
-    function offsetSet($offset, $value) {
+    function offsetSet(mixed $offset, mixed $value): void {
         /* Currently a noop */
     }
 
-    function offsetExists($offset) {
+    function offsetExists(mixed $offset): bool {
         return true;
     }
 
-    function offsetUnset($offset) {
+    function offsetUnset(mixed $offset): void {
         /* Currently a noop */
     }
 
-    function offsetGet($offset) {
+    function offsetGet(mixed $offset): mixed {
         fwrite(STDERR, "__GARLIC_ACCESSED__ " . $this->_garlic_name . "[" . $offset . "] __ENDGARLIC__");
     }
 }

@@ -51,7 +51,7 @@ def copy_nonces_into_container(plugin_name: str) -> None:
 
 
 def run_in_container_and_get_output(cmd: typing.List[str]) -> bytes:
-    return subprocess.check_output(
+    result = subprocess.run(
         [
             "docker",
             "compose",
@@ -59,8 +59,10 @@ def run_in_container_and_get_output(cmd: typing.List[str]) -> bytes:
             "-T",
             "wordpress1",
         ]
-        + cmd
+        + cmd,
+        stdout=subprocess.PIPE,
     )
+    return result.stdout
 
 
 def get_plugin_name_from_file(file_path: str) -> str:
