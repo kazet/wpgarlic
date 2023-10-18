@@ -1,19 +1,5 @@
 --- wp-settings.php.orig	2023-10-02 09:45:51.435209243 +0000
 +++ wp-settings.php	2023-10-02 09:45:51.443209232 +0000
-@@ -66,13 +66,10 @@
- 
- // WordPress calculates offsets from UTC.
- // phpcs:ignore WordPress.DateTime.RestrictedFunctions.timezone_change_date_default_timezone_set
- date_default_timezone_set( 'UTC' );
- 
--// Standardize $_SERVER variables across setups.
--wp_fix_server_vars();
--
- // Check if the site is in maintenance mode.
- wp_maintenance();
- 
- // Start loading timer.
- timer_start();
 @@ -495,13 +492,10 @@
  do_action( 'plugins_loaded' );
  

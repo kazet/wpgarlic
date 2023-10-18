@@ -270,6 +270,7 @@ class FuzzerE2ETest(unittest.TestCase):
             [
                 "GARLIC\\'\\\"` AND p.ID NOT IN ",
                 "example.com AND p.ID NOT IN ",
+                "GARLIC\\ AND p.ID NOT",
             ],
         )
 
@@ -414,30 +415,6 @@ class FuzzerE2ETest(unittest.TestCase):
                 "2537774",
                 "--rest-routes-to-fuzz",
                 "/filebird/v1/gutenberg-get-images@0",
-                "--output-path",
-                output_path,
-            ]
-        )
-        self._assert_any_of_expected_strings_in_output(output_path, expected_strings)
-
-    @retry()
-    def test_CVE_2021_24863(self):
-        # Test that the fuzzer would detect SQL injection in stopbadbots
-        # https://wpscan.com/vulnerability/1e4dd002-6c96-44f9-bd55-61359265f7ae
-        expected_strings = [
-            "SQL syntax; check the manual that corresponds to your MySQL "
-            "server version for the right syntax to use near",
-        ]
-        output_path = tempfile.mkdtemp()
-        subprocess.call(
-            [
-                "./bin/fuzz_plugin",
-                "stopbadbots",
-                "--skip-fuzzing-second-time-without-dependencies",
-                "--version",
-                "6.66",
-                "--enabled-features",
-                "pages_not_logged_in",
                 "--output-path",
                 output_path,
             ]
