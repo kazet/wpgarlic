@@ -1,3 +1,16 @@
+/jetpack/v4@0
+/jetpack/v4/verify_xmlrpc_error@0
+/jetpack/v4/verify_registration@0
+/jetpack/v4/remote_authorize@0
+/jetpack/v4/connection@0
+/jetpack/v4/connection@1
+/jetpack/v4/connection/data@0
+/jetpack/v4/connection/plugins@0
+/jetpack/v4/connection/reconnect@0
+/jetpack/v4/connection/register@0
+/jetpack/v4/connection/authorize_url@0
+/jetpack/v4/user-token@0
+/jetpack/v4/connection/owner@0
 /wc-admin@0
 /wc-admin/features@0
 /wc-analytics@0
@@ -26,6 +39,10 @@
 /wc-admin/marketing/knowledge-base@0
 /wc-admin/marketing/overview/activate-plugin@0
 /wc-admin/marketing/overview/installed-plugins@0
+/wc-admin/marketing/recommendations@0
+/wc-admin/marketing/channels@0
+/wc-admin/marketing/campaigns@0
+/wc-admin/marketing/campaign-types@0
 /wc-admin/options@0
 /wc-admin/options@1
 /wc-analytics/orders@0
@@ -74,6 +91,8 @@
 /wc-analytics/products/(?P<product_id>[\d]+)/variations/(?P<id>[\d]+)@5
 /wc-analytics/products/(?P<product_id>[\d]+)/variations/batch@0
 /wc-analytics/products/(?P<product_id>[\d]+)/variations/batch@1
+/wc-analytics/products/(?P<product_id>[\d]+)/variations/generate@0
+/wc-analytics/products/(?P<product_id>[\d]+)/variations/generate@1
 /wc-analytics/variations@0
 /wc-analytics/variations@1
 /wc-analytics/products/reviews@0
@@ -120,6 +139,10 @@
 /wc-admin/onboarding/tasks/(?P<id>[a-z0-9_\-]+)/undo_snooze@0
 /wc-admin/onboarding/themes/install@0
 /wc-admin/onboarding/themes/activate@0
+/wc-admin/onboarding/plugins/install-and-activate-async@0
+/wc-admin/onboarding/plugins/install-and-activate@0
+/wc-admin/onboarding/plugins/scheduled-installs/(?P<job_id>\w+)@0
+/wc-admin/onboarding/plugins/jetpack-authorization-url@0
 /wc-admin/navigation/favorites/me@0
 /wc-admin/navigation/favorites/me@1
 /wc-admin/navigation/favorites/me@2
@@ -131,6 +154,7 @@
 /wc-analytics/taxes/batch@0
 /wc-admin/mobile-app/send-magic-link@0
 /wc-admin/mobile-app@0
+/wc-admin/shipping-partner-suggestions@0
 /wc-analytics/customers@0
 /wc-analytics/customers/(?P<id>[\d-]+)@0
 /wc-analytics/leaderboards@0
@@ -198,6 +222,7 @@
 /wc/store/products/tags@0
 /wc/store/products@0
 /wc/store/products/(?P<id>[\d]+)@0
+/wc/store/products/(?P<slug>[\S]+)@0
 /wc/store/v1@0
 /wc/store/v1/batch@0
 /wc/store/v1/cart@0
@@ -232,6 +257,7 @@
 /wc/store/v1/products/tags@0
 /wc/store/v1/products@0
 /wc/store/v1/products/(?P<id>[\d]+)@0
+/wc/store/v1/products/(?P<slug>[\S]+)@0
 /wc/v1@0
 /wc/v1/coupons@0
 /wc/v1/coupons@1
@@ -520,6 +546,7 @@
 /wc/v3/products/(?P<product_id>[\d]+)/variations/(?P<id>[\d]+)@1
 /wc/v3/products/(?P<product_id>[\d]+)/variations/(?P<id>[\d]+)@2
 /wc/v3/products/(?P<product_id>[\d]+)/variations/batch@0
+/wc/v3/products/(?P<product_id>[\d]+)/variations/generate@0
 /wc/v3/reports/sales@0
 /wc/v3/reports/top_sellers@0
 /wc/v3/reports/orders/totals@0
@@ -585,6 +612,11 @@
 /wccom-site/v1/installer@0
 /wccom-site/v1/installer@1
 /wccom-site/v1/installer@2
+/wccom-site/v1/ssr@0
+/wccom-site/v2@0
+/wccom-site/v2/installer@0
+/wccom-site/v2/installer@1
 /wp-block-editor/v1@0
 /wp-block-editor/v1/url-details@0
 /wp-block-editor/v1/export@0
+/wp-block-editor/v1/navigation-fallback@0

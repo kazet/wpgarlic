@@ -1,18 +1,16 @@
-*** /var/www/html/wp-load.php.orig	Fri Jul  8 18:38:42 2022
---- /var/www/html/wp-load.php	Fri Jul  8 18:38:42 2022
-***************
-*** 59,71 ****
-  	// A config file doesn't exist.
-  
-  	define( 'WPINC', 'wp-includes' );
-  	require_once ABSPATH . WPINC . '/load.php';
-  
-- 	// Standardize $_SERVER variables across setups.
-- 	wp_fix_server_vars();
-- 
-  	require_once ABSPATH . WPINC . '/functions.php';
-  
-  	$path = wp_guess_url() . '/wp-admin/setup-config.php';
-  
-  	/*
---- 59,68 ----
+--- wp-load.php.orig	2023-07-16 12:16:24.000000000 +0000
++++ wp-load.php	2023-10-02 09:54:30.062521986 +0000
+@@ -64,13 +64,10 @@
+ 	require_once ABSPATH . WPINC . '/load.php';
+ 
+ 	// Check for the required PHP version and for the MySQL extension or a database drop-in.
+ 	wp_check_php_mysql_versions();
+ 
+-	// Standardize $_SERVER variables across setups.
+-	wp_fix_server_vars();
+-
+ 	define( 'WP_CONTENT_DIR', ABSPATH . 'wp-content' );
+ 	require_once ABSPATH . WPINC . '/functions.php';
+ 
+ 	$path = wp_guess_url() . '/wp-admin/setup-config.php';
+ 

@@ -17,6 +17,8 @@ function rebuild_and_restart {
     run_docker_compose up -d
     exec bash -c \
         "/wait-for-it/wait-for-it.sh db_update_blocklists:3306 --timeout=100 -- mysql --host=db_update_blocklists -u wordpress --password=wordpress wordpress < /fuzzer/dump.sql"
+    exec php.orig /wp-cli.phar --allow-root core update
+    exec php.orig /wp-cli.phar --allow-root core update-db
 }
 
 function get_ajax_actions {
