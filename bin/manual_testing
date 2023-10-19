@@ -31,3 +31,10 @@ fi
 
 docker compose -f docker-compose.manual-testing.yml exec wordpress2 bash -c \
     "chown -R www-data:www-data /var/www/html"
+docker compose -f docker-compose.manual-testing.yml exec wordpress2 bash -c \
+    "php.orig /wp-cli.phar --allow-root core update"
+docker compose -f docker-compose.manual-testing.yml exec wordpress2 bash -c \
+    "php.orig /wp-cli.phar --allow-root core update-db"
+docker compose -f docker-compose.manual-testing.yml exec wordpress2 bash -c \
+    "php.orig /wp-cli.phar --allow-root plugin install --activate $parameters < /dev/null"
+docker compose -f docker-compose.manual-testing.yml exec wordpress2 bash
