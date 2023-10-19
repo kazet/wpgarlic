@@ -29,7 +29,7 @@ function get_ajax_actions {
 
 function get_menu_actions {
     exec \
-        php.orig /fuzzer/get_fuzzable_entrypoints/get_menu_actions_to_fuzz.php \
+        php.orig /fuzzer/get_fuzzable_entrypoints/get_menu_actions_to_fuzz.php 1 \
         | grep MENU: | cut -d" " -f2- | tr -d \\r
 }
 
@@ -50,6 +50,9 @@ for plugin in contact-form-7 elementor the-events-calendar woocommerce; do
 
     exec bash -c \
         "php.orig /wp-cli.phar --allow-root plugin install --activate $plugin < /dev/null"
+    exec /fuzzer/just_visit_admin_homepage.sh
+    exec /fuzzer/just_visit_admin_homepage.sh
+    exec /fuzzer/just_visit_admin_homepage.sh
 
     get_ajax_actions > docker_image/blocklists/actions/$plugin
     get_menu_actions > docker_image/blocklists/menu/$plugin

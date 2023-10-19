@@ -1,0 +1,15 @@
+tribe_events_page_edit?post_type=tribe_venue
+tribe_events_page_edit?post_type=tribe_organizer
+admin_page_post-new?post_type=tribe_venue
+admin_page_post-new?post_type=tribe_organizer
+tribe_events_page_aggregator
+tools_page_action-scheduler
+posts_page_action-scheduler
+appearance_page_custom-background
+tribe_events_page_tec-events-settings
+tribe_events_page_tec-events-help
+tribe_events_page_tec-troubleshooting
+tribe_events_page_tribe-app-shop
+admin_page_tec-troubleshooting
+admin_page_tribe-app-shop
+appearance_page_theme-editor

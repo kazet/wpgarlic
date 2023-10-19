@@ -130,6 +130,7 @@ def is_header_interesting(header: str, fuzzer_output_path: str, file_or_action: 
         and not header.startswith("location: http://:8001/")
         and not header.startswith("location: ://:8001/")
         and not header.startswith("location: https://elementor.com/pro/")
+        and not header.startswith("location: https://jetpack.wordpress.com/")
         and not header.startswith("location: ?")
         and "garlic" in header
     ):
