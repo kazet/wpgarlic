@@ -25,6 +25,9 @@ $payloads = array(
     "GARLIC GARLIC\\",
     "1",
     "2",
+    "3",
+    "4",
+    "5",
     "99",  # nonexistent id
     "invalidfolderGARLIC/filenameGARLIC",
     "http://GARLICGARLICGARLIC.example.com",

@@ -47,6 +47,7 @@ def get_matchers(
                 re.compile("UserFullName", flags),
                 re.compile("fuzz.{0,20}@example.com", flags),
                 re.compile("file_GARLIC", flags),
+                re.compile("NOT_PUBLIC_CONTENT", flags),
             ]
         )
     return matchers
