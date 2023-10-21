@@ -29,7 +29,10 @@ def is_call_interesting(
         return "GARLIC" in str(call)
 
     if call["what"] in ["update_user_meta"]:
-        if call["data"]["meta_key"] == "wc_last_active":
+        if call["data"]["meta_key"] in [
+            "wc_last_active",
+            "_woocommerce_tracks_anon_id",
+        ]:
             return False
         return True
 
@@ -85,6 +88,15 @@ def is_call_interesting(
             return True
         else:
             return False
+
+    if call["what"] == "get_users" and call["data"] == {
+        "role": "administrator",
+        "orderby": "user_registered",
+        "order": "ASC",
+        "fields": ["user_registered"],
+        "number": 1,
+    }:  # woocommerce
+        return False
 
     if call["what"] == "get_users" and in_admin_or_profile:
         # There is nothing interesting that get_users() is called on a page or endpoint
@@ -193,6 +205,12 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
     )
     output = re.sub(
         r"Notice: Undefined index:.{0,5}?GARLIC.{0,1024}?on line",
+        "--false-positive--",
+        output,
+        flags=re.M,
+    )
+    output = re.sub(
+        r"unlink\(/var/www/html/wp-content/uploads/woocommerce_uploads/reports/[a-zA-Z0-9._]*.csv.headers\)",
         "--false-positive--",
         output,
         flags=re.M,
