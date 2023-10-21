@@ -50,7 +50,6 @@ def fuzz_plugin(
     file_or_folder_to_fuzz: str = "PLUGIN_ROOT",
     output_path: str = "data/plugin_fuzz_results",
 ):
-
     if not enabled_features:
         enabled_features = config.DEFAULT_ENABLED_FEATURES
     else:
@@ -182,7 +181,7 @@ def fuzz_plugin(
                         command_results += fuzz_pages("RANDOM", 0)
                     else:
                         assert False
-                except Exception as e:
+                except Exception:
                     traceback.print_exc()
                     continue
 

@@ -226,18 +226,8 @@ def reinitialize_containers():
             "mysql --host=db1 -u wordpress --password=wordpress wordpress < /fuzzer/dump.sql",
         ]
     )
-    _run_in_container([
-        "php.orig",
-        "/wp-cli.phar",
-        "--allow-root",
-        "core",
-        "update"])
-    _run_in_container([
-        "php.orig",
-        "/wp-cli.phar",
-        "--allow-root",
-        "core",
-        "update-db"])
+    _run_in_container(["php.orig", "/wp-cli.phar", "--allow-root", "core", "update"])
+    _run_in_container(["php.orig", "/wp-cli.phar", "--allow-root", "core", "update-db"])
 
 
 def install_plugin_from_svn(slug: str, revision: str):
