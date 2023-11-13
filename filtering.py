@@ -136,7 +136,7 @@ def is_header_interesting(header: str, fuzzer_output_path: str, file_or_action: 
             return False
 
     if header.startswith("content-disposition"):
-        # All kinds of pdf, zip exports are potentially interestin
+        # All kinds of pdf, zip exports are potentially interesting
         return True
 
     if (
