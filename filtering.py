@@ -32,6 +32,7 @@ def is_call_interesting(
         if call["data"]["meta_key"] in [
             "wc_last_active",
             "_woocommerce_tracks_anon_id",
+            "_woocommerce_persistent_cart_1",
         ]:
             return False
         return True
@@ -134,6 +135,10 @@ def is_header_interesting(header: str, fuzzer_output_path: str, file_or_action: 
         if filtering_custom.filter_header(header, fuzzer_output_path, file_or_action):
             return False
 
+    if header.startswith("content-disposition"):
+        # All kinds of pdf, zip exports are potentially interestin
+        return True
+
     if (
         header.startswith("location")
         and not header.startswith("location: https://127.0.0.1:8001/")
@@ -153,6 +158,7 @@ def is_header_interesting(header: str, fuzzer_output_path: str, file_or_action: 
 
 def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) -> str:
     SHORT_STRING = "(.|\n){1,256}?"
+    LONG_STRING = "(.|\n){1,1024}?"
 
     output = re.sub(
         r"Stack trace: #0 "
@@ -210,7 +216,7 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
         flags=re.M,
     )
     output = re.sub(
-        r"unlink\(/var/www/html/wp-content/uploads/woocommerce_uploads/reports/[a-zA-Z0-9._]*.csv.headers\)",
+        r"unlink\(/var/www/html/wp-content/uploads/woocommerce_uploads/reports/[a-zA-Z0-9._@-]*.csv.headers\)",
         "--false-positive--",
         output,
         flags=re.M,
@@ -320,6 +326,21 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
     output = re.sub(
         r"WordPress database error Not unique table/alias: 'trel' "
         r"for query.{0,3000}? made by",
+        "--false-positive--",
+        output,
+        flags=re.M,
+    )
+
+    # Unexploitable
+    output = re.sub(
+        "You have an error in your SQL syntax; check the manual that corresponds to your MySQL "
+        + "server version for the right syntax to use near"
+        + LONG_STRING
+        + "wp_posts"
+        + LONG_STRING
+        + "wp_posts"
+        + LONG_STRING
+        + "WP_Query->get_posts",
         "--false-positive--",
         output,
         flags=re.M,
