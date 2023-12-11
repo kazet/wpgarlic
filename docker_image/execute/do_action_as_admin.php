@@ -14,6 +14,8 @@ require_once '/var/www/html/wp-admin/includes/admin.php';
 
 reinitialize_magic();
 
+$_SERVER['SCRIPT_FILENAME'] = "/wp-admin/admin-ajax.php";
+
 do_action('admin_init');
 
 /*

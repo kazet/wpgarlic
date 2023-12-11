@@ -12,6 +12,8 @@ require_once '/var/www/html/wp-admin/includes/admin.php';
 
 reinitialize_magic();
 
+$_SERVER['SCRIPT_FILENAME'] = "/wp-admin/admin-ajax.php";
+
 do_action( 'admin_init' );
 
 if (strstr($_garlic_the_action, '_nopriv_') === false) {
