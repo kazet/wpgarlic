@@ -122,7 +122,7 @@ class FindingsPrinter:
             header = binascii.unhexlify(match.group(1)).decode("ascii", "ignore")
 
             if filtering.is_header_interesting(
-                header, fuzzer_output_path, file_or_action
+                header, fuzzer_output_path, file_or_action, intercepted_variables_info
             ):
                 to_print.append(f"Header: {header}")
 

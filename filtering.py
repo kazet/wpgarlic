@@ -1,4 +1,5 @@
 import re
+from typing import List
 
 try:
     import filtering_custom
@@ -16,6 +17,9 @@ def is_call_interesting(
             return False
 
     if call["what"] in ["delete_option", "delete_site_option"]:
+        if not isinstance(call["data"]["name"], str):
+            return True
+
         if call["data"]["name"].startswith("_transient_"):
             return False
         # For now, let's take into account only the possibility to delete
@@ -110,6 +114,9 @@ def is_call_interesting(
 
         query = call["data"].lower().strip()
 
+        if query == "delete from wp_options where option_name = 'jetpack_secrets'":
+            return False
+
         # Looked like it's mostly false positives. Feel free to investigate them more.
         if query.startswith("delete from wp_usermeta where umeta_id in"):
             return False
@@ -128,15 +135,40 @@ def is_call_interesting(
     return True
 
 
-def is_header_interesting(header: str, fuzzer_output_path: str, file_or_action: str):
+def is_header_interesting(
+    header: str,
+    fuzzer_output_path: str,
+    file_or_action: str,
+    intercepted_variables_info: List[str],
+):
     header = header.lower()
+
+    if (
+        header.startswith("content-disposition: attachment;")
+        and header.endswith(".csv")
+        and "woocommerce_admin_download_report_csv" in repr(intercepted_variables_info)
+    ):
+        return False
 
     if filtering_custom:
         if filtering_custom.filter_header(header, fuzzer_output_path, file_or_action):
             return False
 
-    if header.startswith("content-disposition"):
-        # All kinds of pdf, zip exports are potentially interesting
+    if header.startswith("http/1."):
+        return False
+
+    if header.split(":")[0] not in [
+        "x-powered-by",
+        "set-cookie",
+        "location",
+        "x-redirect-by",
+        "content-type",
+        "expires",
+        "cache-control",
+        "x-frame-options",
+        "referrer-policy",
+    ]:
+        # Let's see what we have
         return True
 
     if (
@@ -319,6 +351,15 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
     output = re.sub(
         r"__GARLIC_NONCE__.{0,300}?__ENDNONCEGARLIC__",
         "",
+        output,
+        flags=re.M,
+    )
+
+    output = re.sub(
+        "require_once\\(/var/www/html/wp-content/plugins/"
+        + SHORT_STRING
+        + ".php\\): failed to open stream:",
+        "--false-positive--",
         output,
         flags=re.M,
     )
