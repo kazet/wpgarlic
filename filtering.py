@@ -365,15 +365,6 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
     )
 
     output = re.sub(
-        "require_once\\(\\): Failed opening required '/var/www/html/wp-content/plugins/"
-        + SHORT_STRING
-        + "\\(include_path",
-        "--false-positive--",
-        output,
-        flags=re.M,
-    )
-
-    output = re.sub(
         r"WordPress database error Not unique table/alias: 'trel' "
         r"for query.{0,3000}? made by",
         "--false-positive--",
