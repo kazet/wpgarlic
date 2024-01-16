@@ -25,10 +25,7 @@ def collect_nonces(plugin_name: str, outs: typing.List[dict]) -> None:
 
     for match in set(matches):
         with open(NONCE_FILENAME, "a") as f:
-            f.write(
-                "%s %s\n"
-                % (plugin_name, base64.b64encode(match.encode("utf-8")).decode("utf-8"))
-            )
+            f.write("%s %s\n" % (plugin_name, base64.b64encode(match.encode("utf-8")).decode("utf-8")))
 
 
 def get_valid_nonces_for_plugin(plugin_name: str) -> typing.List[str]:

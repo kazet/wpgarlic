@@ -8,4 +8,3 @@ curl 'http://127.0.0.1:8001/wp-login.php' \
 sed -i -e "s/^#HttpOnly_//" /tmp/cookies.jar
 
 wget --load-cookies=/tmp/cookies.jar --keep-session-cookies http://127.0.0.1:8001/wp-admin/
-

@@ -4,15 +4,15 @@ index 96169d9a27..20c05f455e 100644
 +++ b/Zend/zend_string.h
 @@ -20,6 +20,8 @@
  #define ZEND_STRING_H
- 
+
  #include "zend.h"
 +#include <unistd.h>
 +#include <time.h>
- 
+
  BEGIN_EXTERN_C()
- 
+
 @@ -311,7 +313,43 @@ static zend_always_inline zend_bool zend_string_equal_val(zend_string *s1, zend_
- 
+
  static zend_always_inline zend_bool zend_string_equal_content(zend_string *s1, zend_string *s2)
  {
 -	return ZSTR_LEN(s1) == ZSTR_LEN(s2) && zend_string_equal_val(s1, s2);
@@ -54,21 +54,21 @@ index 96169d9a27..20c05f455e 100644
 +
 +	return 0;
  }
- 
+
  static zend_always_inline zend_bool zend_string_equals(zend_string *s1, zend_string *s2)
 diff --git a/ext/json/json.c b/ext/json/json.c
 index 8474642266..b7fd3a13d5 100644
 --- a/ext/json/json.c
 +++ b/ext/json/json.c
 @@ -33,7 +33,7 @@
- 
+
  static PHP_MINFO_FUNCTION(json);
  static PHP_FUNCTION(json_encode);
 -static PHP_FUNCTION(json_decode);
 +static PHP_FUNCTION(real_json_decode);
  static PHP_FUNCTION(json_last_error);
  static PHP_FUNCTION(json_last_error_msg);
- 
+
 @@ -66,7 +66,7 @@ ZEND_END_ARG_INFO()
  /* {{{ json_functions[] */
  static const zend_function_entry json_functions[] = {
@@ -79,7 +79,7 @@ index 8474642266..b7fd3a13d5 100644
  	PHP_FE(json_last_error_msg, arginfo_json_last_error_msg)
  	PHP_FE_END
 @@ -308,7 +308,7 @@ static PHP_FUNCTION(json_encode)
- 
+
  /* {{{ proto mixed json_decode(string json [, bool assoc [, int depth]])
     Decodes the JSON representation into a PHP value */
 -static PHP_FUNCTION(json_decode)
@@ -92,7 +92,7 @@ index 0dd4045887..e3820c2ec4 100644
 --- a/ext/standard/base64.c
 +++ b/ext/standard/base64.c
 @@ -943,7 +943,7 @@ PHP_FUNCTION(base64_encode)
- 
+
  /* {{{ proto string base64_decode(string str[, bool strict])
     Decodes string using MIME base64 algorithm */
 -PHP_FUNCTION(base64_decode)
@@ -107,11 +107,11 @@ index faf245c5d9..f9ba87a077 100644
 @@ -59,7 +59,7 @@
   * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   */
- 
+
 -PHP_FUNCTION(base64_decode);
 +PHP_FUNCTION(real_base64_decode);
  PHP_FUNCTION(base64_encode);
- 
+
  #if (ZEND_INTRIN_AVX2_FUNC_PTR || ZEND_INTRIN_SSSE3_FUNC_PTR) && !ZEND_INTRIN_AVX2_NATIVE
 diff --git a/ext/standard/basic_functions.c b/ext/standard/basic_functions.c
 index 64f27ef5af..b13a7d43e0 100644
@@ -120,11 +120,11 @@ index 64f27ef5af..b13a7d43e0 100644
 @@ -2917,7 +2917,7 @@ static const zend_function_entry basic_functions[] = { /* {{{ */
  	PHP_FE(getmyinode,														arginfo_getmyinode)
  	PHP_FE(getlastmod,														arginfo_getlastmod)
- 
+
 -	PHP_FE(base64_decode,													arginfo_base64_decode)
 +	PHP_FE(real_base64_decode,													arginfo_base64_decode)
  	PHP_FE(base64_encode,													arginfo_base64_encode)
- 
+
  	PHP_FE(password_hash,													arginfo_password_hash)
 diff --git a/ext/standard/php_fopen_wrapper.c b/ext/standard/php_fopen_wrapper.c
 index 295751f0db..14112eab7c 100644
@@ -133,7 +133,7 @@ index 295751f0db..14112eab7c 100644
 @@ -216,34 +216,7 @@ php_stream * php_stream_url_wrap_php(php_stream_wrapper *wrapper, const char *pa
  		return php_stream_alloc(&php_stream_output_ops, NULL, 0, "wb");
  	}
- 
+
 -	if (!strcasecmp(path, "input")) {
 -		php_stream_input_t *input;
 -
@@ -171,7 +171,7 @@ index a5a68f8c68..be4a94183b 100644
 --- a/main/SAPI.c
 +++ b/main/SAPI.c
 @@ -652,6 +652,19 @@ static void sapi_header_add_op(sapi_header_op_enum op, sapi_header_struct *sapi_
- 
+
  SAPI_API int sapi_header_op(sapi_header_op_enum op, void *arg)
  {
 +	if (op ==  SAPI_HEADER_ADD || op == SAPI_HEADER_REPLACE) {

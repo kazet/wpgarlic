@@ -15,4 +15,3 @@ include('/var/www/html/wp-admin/menu.php');
 foreach($_registered_pages as $key => $value) {
     echo "MENU: " . $key . "\n";
 }
-

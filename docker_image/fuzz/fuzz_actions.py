@@ -46,8 +46,6 @@ for action in actions_to_fuzz:
         prefix = ""
 
     object_name = action + (" (admin)" if become_admin else "")
-    command_results += fuzz_command(
-        f"{prefix}php /fuzzer/execute/{cmd}.php '{action}'", payload_id, object_name
-    )
+    command_results += fuzz_command(f"{prefix}php /fuzzer/execute/{cmd}.php '{action}'", payload_id, object_name)
 
 print(json.dumps(command_results))
