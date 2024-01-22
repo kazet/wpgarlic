@@ -43,7 +43,11 @@ class FindingsPrinter:
     ) -> bool:
         intercepted_variables_info = []
         for match in fuzzer_output_regexes.INTERCEPT_RE.finditer(output):
-            intercepted_variable_info = json.loads(match.group(1))
+            try:
+                intercepted_variable_info = json.loads(match.group(1))
+            except json.JSONDecodeError:
+                continue
+
             intercepted_variable_info_as_string = (
                 f"{intercepted_variable_info['name']}"
                 f"[{intercepted_variable_info['key']}] = "
@@ -127,7 +131,11 @@ class FindingsPrinter:
                 to_print.append(f"Header: {header}")
 
         for match in call_matches:
-            call_information = json.loads(match.group(1))
+            try:
+                call_information = json.loads(match.group(1))
+            except json.JSONDecodeError:
+                continue
+
             if filtering.is_call_interesting(
                 call_information,
                 in_admin_or_profile,

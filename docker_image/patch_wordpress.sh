@@ -10,6 +10,7 @@ if [ "$1" == '--reverse' ]; then
     cp /var/www/html/wp-includes/pluggable.php.orig /var/www/html/wp-includes/pluggable.php
     cp /var/www/html/wp-includes/user.php.orig /var/www/html/wp-includes/user.php
     cp /var/www/html/wp-includes/class-wpdb.php.orig /var/www/html/wp-includes/class-wpdb.php
+    cp /var/www/html/wp-admin/includes/class-plugin-upgrader.php.orig /var/www/html/wp-admin/includes/class-plugin-upgrader.php
 else
     cp /var/www/html/wp-includes/formatting.php /var/www/html/wp-includes/formatting.php.orig
     cp /var/www/html/wp-settings.php /var/www/html/wp-settings.php.orig
@@ -20,6 +21,7 @@ else
     cp /var/www/html/wp-includes/pluggable.php /var/www/html/wp-includes/pluggable.php.orig
     cp /var/www/html/wp-includes/user.php /var/www/html/wp-includes/user.php.orig
     cp /var/www/html/wp-includes/class-wpdb.php /var/www/html/wp-includes/class-wpdb.php.orig
+    cp /var/www/html/wp-admin/includes/class-plugin-upgrader.php /var/www/html/wp-admin/includes/class-plugin-upgrader.php.orig
 
     patch /var/www/html/wp-settings.php /fuzzer/wordpress_patches/wp-settings.php.patch
     patch /var/www/html/wp-load.php /fuzzer/wordpress_patches/wp-load.php.patch
@@ -68,4 +70,6 @@ else
         /var/www/html/wp-includes/user.php
     sed -i '/^\s*public function query(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "query", "data" => $query)) . "__ENDGARLIC__\\n");' \
         /var/www/html/wp-includes/class-wpdb.php
+    sed -i '/function install(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "install", "data" => array("package" => $package))) . "__ENDGARLIC__\\n");' \
+        /var/www/html/wp-admin/includes/class-plugin-upgrader.php
 fi

@@ -1,7 +1,5 @@
 <?php
 
-include("/fuzzer/functions.php");
-
 $_garlic_found_nonces = explode("\n", file_get_contents("/fuzzer/valid_nonces.txt"));
 
 /* Here, we explicitely want this handler to fire when using the @ operator - but just not
@@ -89,6 +87,19 @@ class MagicPayloadDictionary implements JsonSerializable {
             return $this->parameters[$key];
         }
 
+        if ($key == "REQUEST_METHOD") {
+            $methods = [
+                # GET and POST should be more frequent
+                'GET', 'GET', 'GET',
+                'POST', 'POST', 'POST',
+                'PUT', 'DELETE', 'OPTIONS'];
+            
+            $method = $methods[array_rand($methods)];
+
+            $this->parameters[$key] = $method;
+            return $method;
+        }
+
         if ($this->prefix !== '' && strpos($key, $this->prefix) !== 0) {
             return null;
         }
@@ -138,10 +149,14 @@ class MagicPayloadDictionary implements JsonSerializable {
                 "customize_changeset_uuid",
                 "preview_id",
                 "preview_nonce",
+                "wp_theme_preview",
                 "doing_wp_cron",
                 "replytocom",
                 "wp_customize",
-                "HTTP_AUTHORIZATION"))) {
+                "HTTP_AUTHORIZATION",
+                // these two lead to Location: headers not being real open redirects
+                "HTTP_X_ORIGINAL_URL",
+                "HTTP_X_REWRITE_URL"))) {
             return null;
         }
 
@@ -383,3 +398,6 @@ function reinitialize_magic($get_query=array(), $ignore_wordpress_query_variable
 }
 
 reinitialize_magic();
+
+
+include("/fuzzer/functions.php");

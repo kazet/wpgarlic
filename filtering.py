@@ -162,14 +162,19 @@ def is_header_interesting(
         "set-cookie",
         "location",
         "x-redirect-by",
+        "x-pingback",
         "content-type",
         "expires",
+        "link",
         "cache-control",
         "x-frame-options",
         "referrer-policy",
     ]:
         # Let's see what we have
         return True
+
+    if header.startswith("pragma: no-cache"):
+        return False
 
     if (
         header.startswith("location")
@@ -178,6 +183,7 @@ def is_header_interesting(
         and not header.startswith("location: https://:8001/")
         and not header.startswith("location: http://:8001/")
         and not header.startswith("location: ://:8001/")
+        and not (header.startswith("location: /") and not header.startswith("location: //"))
         and not header.startswith("location: https://elementor.com/pro/")
         and not header.startswith("location: https://jetpack.wordpress.com/")
         and not header.startswith("location: ?")
@@ -219,6 +225,18 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
         + "#3 "
         + SHORT_STRING
         + "#4 ",
+        "--false-positive--",
+        output,
+        flags=re.M,
+    )
+    output = re.sub(
+        r"__FILE_EXISTS_OF_GARLIC_DETECTED__/var/www/html/wp-content/uploads/woocommerce_uploads/reports/" + SHORT_STRING + ".csv.headers",
+        "--false-positive--",
+        output,
+        flags=re.M,
+    )
+    output = re.sub(
+        r"__FILE_EXISTS_OF_GARLIC_DETECTED__/var/www/html/wp-content/uploads/woocommerce_uploads/reports/" + SHORT_STRING + ".csv",
         "--false-positive--",
         output,
         flags=re.M,
