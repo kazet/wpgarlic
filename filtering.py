@@ -7,13 +7,9 @@ except ImportError:
     filtering_custom = None
 
 
-def is_call_interesting(
-    call: dict, in_admin_or_profile: bool, fuzzer_output_path: str, file_or_action: str
-):
+def is_call_interesting(call: dict, in_admin_or_profile: bool, fuzzer_output_path: str, file_or_action: str):
     if filtering_custom:
-        if filtering_custom.filter_call(
-            call, in_admin_or_profile, fuzzer_output_path, file_or_action
-        ):
+        if filtering_custom.filter_call(call, in_admin_or_profile, fuzzer_output_path, file_or_action):
             return False
 
     if call["what"] in ["delete_option", "delete_site_option"]:
@@ -47,8 +43,7 @@ def is_call_interesting(
     if call["what"] in ["wp_mail"]:
         if (
             call["data"]["to"] == "fuzzer@example.com"
-            and call["data"]["subject"]
-            == "[fuzz] Your Site is Experiencing a Technical Issue"
+            and call["data"]["subject"] == "[fuzz] Your Site is Experiencing a Technical Issue"
         ):
             return False
         return True
@@ -70,10 +65,7 @@ def is_call_interesting(
         if call["data"]["name"].startswith("_transient_timeout_"):
             return False
 
-        if (
-            "_admin_notice" in call["data"]["name"]
-            and "two_week_review" in call["data"]["value"]
-        ):
+        if "_admin_notice" in call["data"]["name"] and "two_week_review" in call["data"]["value"]:
             return False
 
         if call["data"]["name"] in ["active_plugins", "auto_update"]:
@@ -230,25 +222,23 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
         flags=re.M,
     )
     output = re.sub(
-        r"__FILE_EXISTS_OF_GARLIC_DETECTED__/var/www/html/wp-content/uploads/woocommerce_uploads/reports/" + SHORT_STRING + ".csv.headers",
+        r"__FILE_EXISTS_OF_GARLIC_DETECTED__/var/www/html/wp-content/uploads/woocommerce_uploads/reports/"
+        + SHORT_STRING
+        + ".csv.headers",
         "--false-positive--",
         output,
         flags=re.M,
     )
     output = re.sub(
-        r"__FILE_EXISTS_OF_GARLIC_DETECTED__/var/www/html/wp-content/uploads/woocommerce_uploads/reports/" + SHORT_STRING + ".csv",
+        r"__FILE_EXISTS_OF_GARLIC_DETECTED__/var/www/html/wp-content/uploads/woocommerce_uploads/reports/"
+        + SHORT_STRING
+        + ".csv",
         "--false-positive--",
         output,
         flags=re.M,
     )
     output = re.sub(
-        r"Stack trace: #0 "
-        + SHORT_STRING
-        + " #1 "
-        + SHORT_STRING
-        + " #2 "
-        + SHORT_STRING
-        + "#3 ",
+        r"Stack trace: #0 " + SHORT_STRING + " #1 " + SHORT_STRING + " #2 " + SHORT_STRING + "#3 ",
         "--false-positive--",
         output,
         flags=re.M,
@@ -282,9 +272,7 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
 
     # Correctly escaped
     output = re.sub(
-        r"The username <strong>"
-        + SHORT_STRING
-        + "</strong> is not registered on this site.",
+        r"The username <strong>" + SHORT_STRING + "</strong> is not registered on this site.",
         "--false-positive--",
         output,
         flags=re.M,
@@ -332,9 +320,7 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
         flags=re.M,
     )
     output = re.sub(
-        "Warning: Illegal string offset '"
-        + SHORT_STRING
-        + "' in /var/www/html/wp-content",
+        "Warning: Illegal string offset '" + SHORT_STRING + "' in /var/www/html/wp-content",
         "--false-positive--",
         output,
         flags=re.M,
@@ -361,8 +347,7 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
     )
 
     output = output.replace(
-        "confirm your email by clicking on the link we sent to fuzzer@example.com. "
-        "This makes sure youre not a bot",
+        "confirm your email by clicking on the link we sent to fuzzer@example.com. " "This makes sure youre not a bot",
         "--false-positive--",
     )
 
@@ -374,17 +359,14 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
     )
 
     output = re.sub(
-        "require_once\\(/var/www/html/wp-content/plugins/"
-        + SHORT_STRING
-        + ".php\\): failed to open stream:",
+        "require_once\\(/var/www/html/wp-content/plugins/" + SHORT_STRING + ".php\\): failed to open stream:",
         "--false-positive--",
         output,
         flags=re.M,
     )
 
     output = re.sub(
-        r"WordPress database error Not unique table/alias: 'trel' "
-        r"for query.{0,3000}? made by",
+        r"WordPress database error Not unique table/alias: 'trel' " r"for query.{0,3000}? made by",
         "--false-positive--",
         output,
         flags=re.M,
@@ -406,8 +388,6 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
     )
 
     if filtering_custom:
-        output = filtering_custom.filter_false_positives(
-            output, endpoint, fuzzer_output_path
-        )
+        output = filtering_custom.filter_false_positives(output, endpoint, fuzzer_output_path)
 
     return output

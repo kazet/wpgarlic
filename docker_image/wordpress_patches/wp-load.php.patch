@@ -2,15 +2,14 @@
 +++ wp-load.php	2023-10-02 09:54:30.062521986 +0000
 @@ -64,13 +64,10 @@
  	require_once ABSPATH . WPINC . '/load.php';
- 
+
  	// Check for the required PHP version and for the MySQL extension or a database drop-in.
  	wp_check_php_mysql_versions();
- 
+
 -	// Standardize $_SERVER variables across setups.
 -	wp_fix_server_vars();
 -
  	define( 'WP_CONTENT_DIR', ABSPATH . 'wp-content' );
  	require_once ABSPATH . WPINC . '/functions.php';
- 
+
  	$path = wp_guess_url() . '/wp-admin/setup-config.php';
- 

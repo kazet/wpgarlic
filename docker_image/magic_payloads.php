@@ -93,7 +93,7 @@ class MagicPayloadDictionary implements JsonSerializable {
                 'GET', 'GET', 'GET',
                 'POST', 'POST', 'POST',
                 'PUT', 'DELETE', 'OPTIONS'];
-            
+
             $method = $methods[array_rand($methods)];
 
             $this->parameters[$key] = $method;

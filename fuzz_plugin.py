@@ -16,19 +16,13 @@ from nonces_storage import collect_nonces
 
 def get_dependencies(slug: str, description: str) -> List[str]:
     dependencies = []
-    if (
-        "cf7" in slug or "contact-form-7" in description.lower()
-    ) and slug != "contact-form-7":
+    if ("cf7" in slug or "contact-form-7" in description.lower()) and slug != "contact-form-7":
         dependencies.append("contact-form-7")
 
-    if (
-        "woo" in slug or "woocommerce" in description.lower()
-    ) and slug != "woocommerce":
+    if ("woo" in slug or "woocommerce" in description.lower()) and slug != "woocommerce":
         dependencies.append("woocommerce")
 
-    if (
-        "elementor" in slug or "elementor" in description.lower()
-    ) and slug != "elementor":
+    if ("elementor" in slug or "elementor" in description.lower()) and slug != "elementor":
         dependencies.append("elementor")
 
     if (
@@ -66,14 +60,11 @@ def fuzz_plugin(
         from_file = True
     else:
         slug = slug_or_path
-        assert all(
-            [letter in string.ascii_letters + string.digits + "-_" for letter in slug]
-        )
+        assert all([letter in string.ascii_letters + string.digits + "-_" for letter in slug])
 
         print("Looking for", slug)
         plugin_info_dict = requests.get(
-            f"https://api.wordpress.org/plugins/info/1.2/?action=plugin_information"
-            f"&request[slug]={slug}"
+            f"https://api.wordpress.org/plugins/info/1.2/?action=plugin_information" f"&request[slug]={slug}"
         ).json()
         from_file = False
 
@@ -150,31 +141,21 @@ def fuzz_plugin(
             for task in tasks:
                 try:
                     if task == "files":
-                        command_results += fuzz_file_or_folder(
-                            "RANDOM", file_or_folder_to_fuzz
-                        )
+                        command_results += fuzz_file_or_folder("RANDOM", file_or_folder_to_fuzz)
                     elif task == "actions":
                         command_results += fuzz_actions("RANDOM", actions_to_fuzz, slug)
                     elif task == "actions_admin":
-                        command_results_but_not_for_nonces += fuzz_actions_admin(
-                            "RANDOM", actions_to_fuzz, slug
-                        )
+                        command_results_but_not_for_nonces += fuzz_actions_admin("RANDOM", actions_to_fuzz, slug)
                     elif task == "rest_routes":
-                        command_results += fuzz_rest_routes(
-                            "RANDOM", rest_routes_to_fuzz, slug
-                        )
+                        command_results += fuzz_rest_routes("RANDOM", rest_routes_to_fuzz, slug)
                     elif task == "rest_routes_admin":
                         command_results_but_not_for_nonces += fuzz_rest_routes_admin(
                             "RANDOM", rest_routes_to_fuzz, slug
                         )
                     elif task == "menu_subscriber":
-                        command_results_but_not_for_nonces += fuzz_menu(
-                            "RANDOM", menu_actions_to_fuzz, slug, 2
-                        )
+                        command_results_but_not_for_nonces += fuzz_menu("RANDOM", menu_actions_to_fuzz, slug, 2)
                     elif task == "menu_admin":
-                        command_results_but_not_for_nonces += fuzz_menu(
-                            "RANDOM", menu_actions_to_fuzz, slug, 1
-                        )
+                        command_results_but_not_for_nonces += fuzz_menu("RANDOM", menu_actions_to_fuzz, slug, 1)
                     elif task == "pages_subscriber":
                         command_results += fuzz_pages("RANDOM", 2)
                     elif task == "pages_not_logged_in":

@@ -5,4 +5,3 @@ class FakeUser {
 		$this->ID = $id;
 	}
 }
-

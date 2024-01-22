@@ -17,4 +17,3 @@ timeout 240 wget \
     --domains=127.0.0.1 \
     --reject-regex='.*(customize.php|theme-editor.php|plugins.php|update.php|/js/|plugin-install.php|plugin-editor.php|site-health.php).*' \
     http://127.0.0.1:8001/wp-admin/
-

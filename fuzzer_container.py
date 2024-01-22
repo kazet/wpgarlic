@@ -146,21 +146,16 @@ def get_container_id() -> bytes:
 
 
 def disconnect_network(container_id: bytes) -> int:
-    networks = subprocess.check_output(
-        ["docker", "network", "ls", "--format", "{{.Name}}"]
-    ).decode("utf-8")
+    networks = subprocess.check_output(["docker", "network", "ls", "--format", "{{.Name}}"]).decode("utf-8")
 
     network_name = "wpgarlic_network2"
 
     if network_name not in networks.split():
         raise Exception(
-            f"Network {network_name} not found. Make sure the folder name "
-            "where the tool is stored is `wpgarlic`"
+            f"Network {network_name} not found. Make sure the folder name " "where the tool is stored is `wpgarlic`"
         )
 
-    return subprocess.call(
-        ["docker", "network", "disconnect", network_name, container_id]
-    )
+    return subprocess.call(["docker", "network", "disconnect", network_name, container_id])
 
 
 def disconnect_dns() -> None:
@@ -213,9 +208,7 @@ def reinitialize_containers():
             "-d",
         ]
     )
-    _run_in_container(
-        ["/wait-for-it/wait-for-it.sh", "-h", "db1", "-p", "3306", "-t", "0"]
-    )
+    _run_in_container(["/wait-for-it/wait-for-it.sh", "-h", "db1", "-p", "3306", "-t", "0"])
     time.sleep(2)
     _run_in_container(["chown", "-R", "www-data:www-data", "/var/www/html"])
     _run_in_container(["/fuzzer/create_findable_files.sh"])

@@ -23,13 +23,8 @@ def retry(num=5):
 
 
 class FuzzerE2ETest(unittest.TestCase):
-    def _assert_any_of_expected_strings_in_output(
-        self, output_path: str, expected_strings: typing.List[str]
-    ):
-        print(
-            f"Verifying expected_strings={expected_strings} "
-            f"output_path={output_path}"
-        )
+    def _assert_any_of_expected_strings_in_output(self, output_path: str, expected_strings: typing.List[str]):
+        print(f"Verifying expected_strings={expected_strings} " f"output_path={output_path}")
         findings_printer_result = subprocess.check_output(
             [
                 "python3",
@@ -44,8 +39,7 @@ class FuzzerE2ETest(unittest.TestCase):
                 found = True
         self.assertTrue(
             found,
-            msg=f"none of expected_strings={expected_strings} found in findings "
-            f"printer result for {output_path}",
+            msg=f"none of expected_strings={expected_strings} found in findings " f"printer result for {output_path}",
         )
 
     def _fuzz_file_and_check_expected_strings(
@@ -227,9 +221,7 @@ class FuzzerE2ETest(unittest.TestCase):
             "protect-wp-admin",
             ["--revision", "2581706"],
             "/var/www/html/wp-content/plugins/protect-wp-admin/lib/pwa-deactivate.php",
-            [
-                "Call: update_option arguments={'name': 'active_plugins', 'value': 'Array"
-            ],
+            ["Call: update_option arguments={'name': 'active_plugins', 'value': 'Array"],
         )
 
     @retry()
@@ -372,9 +364,7 @@ class FuzzerE2ETest(unittest.TestCase):
         # Test that the fuzzer would detect
         # stored XSS in social-networks-auto-poster-facebook-twitter-g
         # https://wpscan.com/vulnerability/b99dae3d-8230-4427-adc5-4ef9cbfb8ba1
-        expected_strings = [
-            "/var/www/html/127.0.0.1:8001/wp-admin/admin.php?page=nxs-log:"
-        ]
+        expected_strings = ["/var/www/html/127.0.0.1:8001/wp-admin/admin.php?page=nxs-log:"]
         output_path = tempfile.mkdtemp()
         subprocess.call(
             [
@@ -400,8 +390,7 @@ class FuzzerE2ETest(unittest.TestCase):
         expected_strings = [
             "for query SELECT `attachment_id` FROM wp_fbv_attachment_folder "
             "WHERE 1 = 1 AND `folder_id` IN (legitimate",
-            "for query SELECT `attachment_id` FROM wp_fbv_attachment_folder "
-            "WHERE 1 = 1 AND `folder_id` IN (</GARL",
+            "for query SELECT `attachment_id` FROM wp_fbv_attachment_folder " "WHERE 1 = 1 AND `folder_id` IN (</GARL",
         ]
         output_path = tempfile.mkdtemp()
         subprocess.call(
@@ -495,9 +484,7 @@ class FuzzerE2ETest(unittest.TestCase):
                 output_path,
             ]
         )
-        self._assert_any_of_expected_strings_in_output(
-            output_path, ["__FILE_EXISTS_OF_GARLIC_DETECTED__"]
-        )
+        self._assert_any_of_expected_strings_in_output(output_path, ["__FILE_EXISTS_OF_GARLIC_DETECTED__"])
 
     @retry()
     def test_backup_backup_rce(self):
@@ -516,6 +503,4 @@ class FuzzerE2ETest(unittest.TestCase):
                 output_path,
             ]
         )
-        self._assert_any_of_expected_strings_in_output(
-            output_path, ["Warning: require_once(GARLIC GARLIC"]
-        )
+        self._assert_any_of_expected_strings_in_output(output_path, ["Warning: require_once(GARLIC GARLIC"])

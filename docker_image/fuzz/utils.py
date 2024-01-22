@@ -33,10 +33,7 @@ def fuzz_command(
 ) -> typing.List[typing.Dict]:
     command_results = []
     for intercept_prob in VARIABLE_INTERCEPT_PROBABILITIES:
-        cmd_prefixed = (
-            f"export INTERCEPT_PROB={intercept_prob}; export PAYLOAD_ID={payload_id.strip()}; "
-            + cmd
-        )
+        cmd_prefixed = f"export INTERCEPT_PROB={intercept_prob}; export PAYLOAD_ID={payload_id.strip()}; " + cmd
         cmd_wrapped = ["bash", "-c", cmd_prefixed]
 
         try:

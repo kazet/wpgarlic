@@ -25,34 +25,22 @@ class CrashDetectorTest(unittest.TestCase):
         raise Exception(f"Unable to detect crash in '{output}'")
 
     def test_lack_of_quotes_after_parameter_value_is_detected(self):
-        output = run_in_container_and_get_output(
-            ["php", "-r", 'echo "<a b-p-G_ref=page.php?GARLIC GARLIC";']
-        )
+        output = run_in_container_and_get_output(["php", "-r", 'echo "<a b-p-G_ref=page.php?GARLIC GARLIC";'])
         self.assertAnyMatcherWouldDetect(output)
-        output = run_in_container_and_get_output(
-            ["php", "-r", 'echo "<a b-p-G_ref=GARLIC GARLIC";']
-        )
+        output = run_in_container_and_get_output(["php", "-r", 'echo "<a b-p-G_ref=GARLIC GARLIC";'])
         self.assertAnyMatcherWouldDetect(output)
-        output = run_in_container_and_get_output(
-            ["php", "-r", 'echo "\nhref=GARLIC GARLIC";']
-        )
+        output = run_in_container_and_get_output(["php", "-r", 'echo "\nhref=GARLIC GARLIC";'])
         self.assertAnyMatcherWouldDetect(output)
 
     def test_weridly_escaped_payloads_are_detected(self):
-        output = run_in_container_and_get_output(
-            ["php", "-r", "echo 'GARLIC\\\\\\\\\\'\\\\\\\\\\\"';"]
-        )
+        output = run_in_container_and_get_output(["php", "-r", "echo 'GARLIC\\\\\\\\\\'\\\\\\\\\\\"';"])
         self.assertAnyMatcherWouldDetect(output)
 
-        output = run_in_container_and_get_output(
-            ["php", "-r", "echo 'GARLIC\\\\\\\\\\\\\\\\\\'\\\\\\\\\\\\\\\\\"';"]
-        )
+        output = run_in_container_and_get_output(["php", "-r", "echo 'GARLIC\\\\\\\\\\\\\\\\\\'\\\\\\\\\\\\\\\\\"';"])
         self.assertAnyMatcherWouldDetect(output)
 
     def test_libxml_crashes_are_detected(self):
-        output = run_in_container_and_get_output(
-            ["php", "-r", 'simplexml_load_string("BAD XML");']
-        )
+        output = run_in_container_and_get_output(["php", "-r", 'simplexml_load_string("BAD XML");'])
         self.assertAnyMatcherWouldDetect(output)
 
     def test_file_write_crashes_are_detected(self):

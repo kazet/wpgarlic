@@ -71,9 +71,7 @@ class FindingsPrinter:
         output = re.sub(fuzzer_output_regexes.COULD_AS_WELL_BE_EQUAL_RE, "", output)
         output = re.sub(fuzzer_output_regexes.CALL_RE, "", output)
         output = re.sub(fuzzer_output_regexes.HEADER_RE, "", output)
-        output = filtering.filter_false_positives(
-            output, file_or_action, fuzzer_output_path
-        )
+        output = filtering.filter_false_positives(output, file_or_action, fuzzer_output_path)
 
         lcontext = 300
         rcontext = 500
@@ -110,8 +108,7 @@ class FindingsPrinter:
             match = output[match_position : match_position + match_size]
             left_context = output[max(0, match_position - lcontext) : match_position]
             right_context = output[
-                match_position
-                + match_size : min(len(output), match_position + match_size + rcontext)
+                match_position + match_size : min(len(output), match_position + match_size + rcontext)
             ]
             data = (
                 colored(left_context, color="green", with_color=with_color)
@@ -125,9 +122,7 @@ class FindingsPrinter:
         for match in header_matches:
             header = binascii.unhexlify(match.group(1)).decode("ascii", "ignore")
 
-            if filtering.is_header_interesting(
-                header, fuzzer_output_path, file_or_action, intercepted_variables_info
-            ):
+            if filtering.is_header_interesting(header, fuzzer_output_path, file_or_action, intercepted_variables_info):
                 to_print.append(f"Header: {header}")
 
         for match in call_matches:
@@ -142,9 +137,7 @@ class FindingsPrinter:
                 fuzzer_output_path,
                 file_or_action,
             ):
-                to_print.append(
-                    f"Call: {call_information['what']} arguments={call_information['data']}"
-                )
+                to_print.append(f"Call: {call_information['what']} arguments={call_information['data']}")
 
         for data in to_print:
             data = trim_if_too_long(data)
@@ -192,19 +185,13 @@ def print_findings_from_folder(
     os.makedirs(os.path.join(output_folder, "scanned"), exist_ok=True)
 
     if show_only_paths_containing:
-        file_names = [
-            file_name
-            for file_name in file_names
-            if show_only_paths_containing in file_name
-        ]
+        file_names = [file_name for file_name in file_names if show_only_paths_containing in file_name]
 
     file_names = list(
         reversed(
             sorted(
                 file_names,
-                key=lambda file_name: os.path.getmtime(
-                    os.path.join(output_folder, file_name)
-                ),
+                key=lambda file_name: os.path.getmtime(os.path.join(output_folder, file_name)),
             )
         )
     )
@@ -238,9 +225,7 @@ def print_findings_from_folder(
                     command["stderr"] = ""
 
                 anything_printed |= findings_printer.print_findings(
-                    (command["output"] + command["stdout"] + command["stderr"])
-                    .replace("\n", " ")
-                    .replace("\r", " "),
+                    (command["output"] + command["stdout"] + command["stderr"]).replace("\n", " ").replace("\r", " "),
                     file_path,
                     results["active_installs"],
                     command["object_name"],

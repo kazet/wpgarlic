@@ -131,10 +131,19 @@ Warning: the tests take long (more than an hour) and because they check whether 
 would find vulnerabilities, they fail with some probability.
 
 ### Reformatting code and running linters
-To reformat and check the code, use:
+wpgarlic uses `pre-commit` to run linters and format the code.
+`pre-commit` is executed on CI to verify that the code is formatted properly.
+
+To run it locally, use:
 
 ```
-./bin/reformat
+pre-commit run --all-files
+```
+
+To setup `pre-commit` so that it runs before each commit, use:
+
+```
+pre-commit install
 ```
 
 ## Manual testing environment
