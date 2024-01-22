@@ -157,6 +157,9 @@ def is_header_interesting(
     if header.startswith("http/1."):
         return False
 
+    if header.startswith("pragma: no-cache"):
+        return False
+
     if header.split(":")[0] not in [
         "x-powered-by",
         "set-cookie",
@@ -172,9 +175,6 @@ def is_header_interesting(
     ]:
         # Let's see what we have
         return True
-
-    if header.startswith("pragma: no-cache"):
-        return False
 
     if (
         header.startswith("location")
