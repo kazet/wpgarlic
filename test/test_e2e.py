@@ -464,3 +464,43 @@ class FuzzerE2ETest(unittest.TestCase):
             ]
         )
         self._assert_any_of_expected_strings_in_output(output_path, expected_strings)
+
+    @retry()
+    def test_wp_compress_image_optimizer_arbitrary_file_read(self):
+        # Test that the fuzzer would detect arbitrary file read in wp-compress-image-optimizer
+        # https://www.wordfence.com/threat-intel/vulnerabilities/wordpress-plugins/wp-compress-image-optimizer/wp-compress-image-optimizer-all-in-one-61033-unauthenticated-directory-traversal-via-css
+        output_path = tempfile.mkdtemp()
+        subprocess.call(
+            [
+                "./bin/fuzz_plugin",
+                "wp-compress-image-optimizer",
+                "--enabled-features",
+                "files",
+                "--file-or-folder-to-fuzz",
+                "/var/www/html/wp-content/plugins/wp-compress-image-optimizer/fixCss.php",
+                "--version",
+                "6.10.32",
+                "--output-path",
+                output_path,
+            ]
+        )
+        self._assert_any_of_expected_strings_in_output(output_path, ["__FILE_EXISTS_OF_GARLIC_DETECTED__"])
+
+    @retry()
+    def test_backup_backup_rce(self):
+        output_path = tempfile.mkdtemp()
+        subprocess.call(
+            [
+                "./bin/fuzz_plugin",
+                "backup-backup",
+                "--version",
+                "1.3.7",
+                "--enabled-features",
+                "files",
+                "--file-or-folder-to-fuzz",
+                "/var/www/html/wp-content/plugins/backup-backup/includes/backup-heart.php",
+                "--output-path",
+                output_path,
+            ]
+        )
+        self._assert_any_of_expected_strings_in_output(output_path, ["Warning: require_once(GARLIC GARLIC"])

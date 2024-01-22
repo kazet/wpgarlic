@@ -7,6 +7,12 @@ def get_matchers(
 ) -> typing.List["re.Pattern"]:
     flags = re.DOTALL | re.IGNORECASE
     matchers = [
+        # js redirects
+        re.compile("location=.{0,10}GARLIC", flags),
+        re.compile("location.href=.{0,10}GARLIC", flags),
+        re.compile("Unable to prepare statement", flags),
+        re.compile("__FWRITE_OF_GARLIC_DETECTED__", flags),
+        re.compile("__FILE_EXISTS_OF_GARLIC_DETECTED__", flags),
         re.compile("fopen\\(.{0,256}GARLIC", flags),
         # [^_D]GARLIC is to exclude __GARLIC and __ENDGARLIC
         re.compile("require\\(.{0,256}[^_D]GARLIC", flags),
@@ -21,7 +27,10 @@ def get_matchers(
         re.compile("<GARLIC", flags),
         # Forgot quotes that allow xss?
         re.compile("\\s[A-Za-z_0-9-]+\\s*=\\s*[^\\s\"']*GARLIC GARLIC", flags),
-        re.compile("^[A-Za-z_0-9-]+\\s*=\\s*[^\\s\"']*GARLIC GARLIC", flags),
+        re.compile("^\\s*[A-Za-z_0-9-]+\\s*=\\s*[^\\s\"']*GARLIC GARLIC", flags),
+        # Let's detect escaping only double quotes in the context of a single quote
+        re.compile("\\s[A-Za-z_0-9-]+\\s*=\\s*'.{0,20}[^e]GARLIC\\\\*'", flags),
+        re.compile("^\\s*[A-Za-z_0-9-]+\\s*=\\s*'.{0,20}[^e]GARLIC\\\\*'", flags),
         re.compile("GARLIC'\"", flags),
         re.compile(r"GARLIC\\'\\\"", flags),
         re.compile(r"GARLIC\\\\*'\\\\*\"", flags),
