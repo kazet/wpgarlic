@@ -504,3 +504,23 @@ class FuzzerE2ETest(unittest.TestCase):
             ]
         )
         self._assert_any_of_expected_strings_in_output(output_path, ["Warning: require_once(GARLIC GARLIC"])
+
+    @retry()
+    def test_ai_assistant_by_10web_arbitrary_plugin_installation(self):
+        # https://www.wordfence.com/threat-intel/vulnerabilities/id/229245a5-468d-47b9-8f26-d23d593e91da
+        output_path = tempfile.mkdtemp()
+        subprocess.call(
+            [
+                "./bin/fuzz_plugin",
+                "ai-assistant-by-10web",
+                "--enabled-features",
+                "actions",
+                "--actions-to-fuzz",
+                "wp_ajax_install_plugin",
+                "--version",
+                "1.0.18",
+                "--output-path",
+                output_path,
+            ]
+        )
+        self._assert_any_of_expected_strings_in_output(output_path, ["__FILE_EXISTS_OF_GARLIC_DETECTED__"])
