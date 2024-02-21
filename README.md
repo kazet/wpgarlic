@@ -180,10 +180,6 @@ edit `docker_image/magic_payloads.php` and `docker_image/fuzz/config.py`.
 `crash_detector.py` contans regular expressions that find interesting crashes or interesting
 information (e.g. e-mails) being exposed.
 
-Fuzzing files (i.e. executing each PHP file with injected payloads) has been disabled
-because it didn't lead to many findings. Uncomment `files` in  `config.DEFAULT_ENABLED_FEATURES`
-to change that.
-
 Fuzzing REST routes as logged-in admin has been disabled as it led to false positives.
 Uncomment `rest_routes_admin` in  `config.DEFAULT_ENABLED_FEATURES` to change that.
 
