@@ -372,7 +372,7 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
         flags=re.M,
     )
 
-    if '/wc-logs/' in endpoint:
+    if "/wc-logs/" in endpoint:
         output = re.sub(
             r" WC_Legacy_API->maybe_log_rest_api_request\(" + SHORT_STRING + r"\)",
             "--false-positive--",
