@@ -7,6 +7,7 @@ wp_ajax_add-link_category
 wp_ajax_add-post_format
 wp_ajax_add-wp_theme
 wp_ajax_add-wp_template_part_area
+wp_ajax_add-wp_pattern_category
 wp_ajax_woocommerce_get_refreshed_fragments
 wp_ajax_nopriv_woocommerce_get_refreshed_fragments
 wp_ajax_woocommerce_apply_coupon

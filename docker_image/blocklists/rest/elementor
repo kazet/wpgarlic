@@ -14,6 +14,8 @@
 /elementor/v1/kit-elements-defaults@0
 /elementor/v1/kit-elements-defaults/(?P<type>[\w\-\_]+)@0
 /elementor/v1/kit-elements-defaults/(?P<type>[\w\-\_]+)@1
+/elementor/v1/site-navigation/recent-posts@0
+/elementor/v1/site-navigation/add-new-post@0
 /elementor/v1/template-library/templates@0
 /elementor/v1/template-library/templates@1
 /elementor/v1/send-event@0
