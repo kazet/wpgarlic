@@ -9,7 +9,6 @@ DEFAULT_ENABLED_FEATURES = [
     "find_in_files_after_fuzzing",
     "find_in_admin_after_fuzzing",
     "find_in_pages_after_fuzzing",
-    # Disabled - see README.txt
-    # "files",
+    "files",
     # "rest_routes_admin",
 ]
