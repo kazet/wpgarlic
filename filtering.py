@@ -372,6 +372,20 @@ def filter_false_positives(output: str, endpoint: str, fuzzer_output_path: str) 
         flags=re.M,
     )
 
+    if "/wc-logs/" in endpoint:
+        output = re.sub(
+            r" WC_Legacy_API->maybe_log_rest_api_request\(" + SHORT_STRING + r"\)",
+            "--false-positive--",
+            output,
+            flags=re.M,
+        )
+        output = re.sub(
+            r" INFO Version: [0-9]*, Route: " + SHORT_STRING + "User agent: " + SHORT_STRING + "$",
+            "--false-positive--",
+            output,
+            flags=re.M,
+        )
+
     # Unexploitable
     output = re.sub(
         "You have an error in your SQL syntax; check the manual that corresponds to your MySQL "
