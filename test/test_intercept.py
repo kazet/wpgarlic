@@ -85,6 +85,14 @@ class FuzzerInterceptTest(unittest.TestCase):
         commands = fuzzer_container.fuzz_file_or_folder("0", "/fuzzer/test/system_request.php")
         self.assertEqual(self._clean(commands[0]["stderr"]), "sh: 1: legitimateGARLIC: not found")
 
+    def test_FILE_iteration(self):
+        commands = fuzzer_container.fuzz_file_or_folder("0", "/fuzzer/test/file_iteration.php")
+        self.assertEqual(self._clean(commands[0]["stderr"]), "__GARLIC_ACCESSED__ _FILES[] __ENDGARLIC__")
+
+    def test_GET_iteration(self):
+        commands = fuzzer_container.fuzz_file_or_folder("0", "/fuzzer/test/get_iteration.php")
+        self.assertEqual(self._clean(commands[0]["stdout"]), "</GARLIC>legitimateGARLIC")
+
     def test_HTTP_USER_AGENT_header(self):
         commands = fuzzer_container.fuzz_file_or_folder("0", "/fuzzer/test/system_server_http_user_agent.php")
         self.assertEqual(self._clean(commands[0]["stderr"]), "sh: 1: legitimateGARLIC: not found")
