@@ -5,4 +5,3 @@ foreach ($_FILES as $key => $value) {
 };
 
 ?>
-
