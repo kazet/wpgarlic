@@ -1,16 +1,34 @@
---- wp-settings.php.orig	2023-10-02 09:45:51.435209243 +0000
-+++ wp-settings.php	2023-10-02 09:45:51.443209232 +0000
-@@ -495,13 +492,10 @@
- do_action( 'plugins_loaded' );
+*** wp-settings.php.orig	Mon Feb 12 06:39:51 2024
+--- wp-settings.php	Mon Feb 12 06:40:53 2024
+***************
+*** 66,78 ****
 
- // Define constants which affect functionality if not already defined.
- wp_functionality_constants();
+  // WordPress calculates offsets from UTC.
+  // phpcs:ignore WordPress.DateTime.RestrictedFunctions.timezone_change_date_default_timezone_set
+  date_default_timezone_set( 'UTC' );
 
--// Add magic quotes and set up $_REQUEST ( $_GET + $_POST ).
--wp_magic_quotes();
+- // Standardize $_SERVER variables across setups.
+- wp_fix_server_vars();
 -
- /**
-  * Fires when comment cookies are sanitized.
-  *
-  * @since 2.0.11
-  */
+  // Check if the site is in maintenance mode.
+  wp_maintenance();
+
+  // Start loading timer.
+  timer_start();
+--- 66,75 ----
+***************
+*** 506,518 ****
+  do_action( 'plugins_loaded' );
+
+  // Define constants which affect functionality if not already defined.
+  wp_functionality_constants();
+
+- // Add magic quotes and set up $_REQUEST ( $_GET + $_POST ).
+- wp_magic_quotes();
+-
+  /**
+   * Fires when comment cookies are sanitized.
+   *
+   * @since 2.0.11
+   */
+--- 503,512 ----
