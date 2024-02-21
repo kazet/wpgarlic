@@ -15,6 +15,7 @@ pages = [
     ("/var/www/html/index.php", "p=3"),
     ("/var/www/html/index.php", "p=4"),
     ("/var/www/html/wp-login.php", ""),
+    ("/var/www/html/wp-admin/", ""),
     ("/var/www/html/wp-admin/admin.php", ""),
 ]
 
