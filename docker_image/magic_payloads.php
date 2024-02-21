@@ -139,6 +139,19 @@ class MagicPayloadDictionary implements JsonSerializable {
         if (in_array(
             $key,
             array(
+                "HTTP_CLIENT_IP",
+                "HTTP_X_CLIENT_IP",
+                "HTTP_X_FORWARDED_FOR",
+                "HTTP_X_REAL_IP",
+                "HTTP_CF_CONNECTING_IP",
+                "HTTP_TRUE_CLIENT_IP",
+            ))) {
+            fwrite(STDERR, '__GARLIC_SPOOFABLE_IP_HEADER__' . $key);
+        }
+
+        if (in_array(
+            $key,
+            array(
                 "wp_screen_options",
                 "_locale",
                 "_jsonp",
@@ -298,7 +311,7 @@ class MagicPayloadDictionary implements JsonSerializable {
 }
 
 
-class MagicArray extends MagicPayloadDictionary implements ArrayAccess, Countable {
+class MagicArray extends MagicPayloadDictionary implements ArrayAccess, Countable, IteratorAggregate {
     function count() {
         return rand() % 3;
     }
@@ -319,6 +332,13 @@ class MagicArray extends MagicPayloadDictionary implements ArrayAccess, Countabl
     function offsetGet($offset) {
         return $this->getAndSaveForFurtherGets($offset);
     }
+
+    function getIterator() {
+        return new ArrayIterator(array(
+            "</GARLIC>" => $this->getAndSaveForFurtherGets("</GARLIC>"),
+            "legitimateGARLIC" => $this->getAndSaveForFurtherGets("legitimateGARLIC"),
+        ));
+    }
 }
 
 
@@ -329,7 +349,7 @@ class MagicArrayOrObject extends MagicArray {
 }
 
 
-class AccessLoggingArray implements ArrayAccess {
+class AccessLoggingArray implements ArrayAccess, IteratorAggregate {
     function __construct($name) {
         $this->_garlic_name = $name;
     }
@@ -348,6 +368,11 @@ class AccessLoggingArray implements ArrayAccess {
 
     function offsetGet($offset) {
         fwrite(STDERR, "__GARLIC_ACCESSED__ " . $this->_garlic_name . "[" . $offset . "] __ENDGARLIC__");
+    }
+
+    function getIterator() {
+        fwrite(STDERR, "__GARLIC_ACCESSED__ " . $this->_garlic_name . "[] __ENDGARLIC__");
+        return new ArrayIterator(array());
     }
 }
 
