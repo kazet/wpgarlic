@@ -182,8 +182,6 @@ def disconnect_network(container_id: bytes) -> int:
 
     if network_name not in networks.split():
         raise Exception(
-            f"Network {network_name} not found. Make sure the folder name "
-            "where the tool is stored is `wpgarlic`"
             f"Network {network_name} not found."
         )
 
