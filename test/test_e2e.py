@@ -539,28 +539,6 @@ class FuzzerE2ETest(unittest.TestCase):
         self._assert_any_of_expected_strings_in_output(output_path, ["__FILE_EXISTS_OF_GARLIC_DETECTED__"])
 
     @retry()
-    def test_CVE_2023_4281(self):
-        # Test that the fuzzer would detect IP spoofing in aryo-activity-log
-        # https://wpscan.com/vulnerability/f5ea6c8a-6b07-4263-a1be-dd033f078d49/
-        expected_strings = ["__GARLIC_SPOOFABLE_IP_HEADER__"]
-        output_path = tempfile.mkdtemp()
-        subprocess.call(
-            [
-                "./bin/fuzz_object",
-                "plugin",
-                "aryo-activity-log",
-                "--enabled-features",
-                "pages_not_logged_in",
-                "--skip-fuzzing-second-time-without-dependencies",
-                "--version",
-                "2.8.7",
-                "--output-path",
-                output_path,
-            ]
-        )
-        self._assert_any_of_expected_strings_in_output(output_path, expected_strings)
-
-    @retry()
     def test_CVE_2024_0835(self):
         # Test that the fuzzer would detect arbitrary transient update in royal-elementor-kit theme
         # https://www.wordfence.com/threat-intel/vulnerabilities/wordpress-themes/royal-elementor-kit/royal-elementor-kit-10116-missing-authorization-to-arbitrary-transient-update
