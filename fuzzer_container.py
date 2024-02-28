@@ -181,9 +181,7 @@ def disconnect_network(container_id: bytes) -> int:
     network_name = f"{os.path.basename(os.path.dirname(__file__))}_network2"
 
     if network_name not in networks.split():
-        raise Exception(
-            f"Network {network_name} not found."
-        )
+        raise Exception(f"Network {network_name} not found.")
 
     return subprocess.call(["docker", "network", "disconnect", network_name, container_id])
 
