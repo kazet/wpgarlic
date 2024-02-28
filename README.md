@@ -1,6 +1,6 @@
 # wpgarlic
 A proof-of-concept WordPress plugin fuzzer that led to the discovery of more than 250 vulnerabilities
-in WordPress plugins installed on more than 15 million sites.
+in WordPress plugins installed on around 20 million sites.
 
 The used technique is described in https://kazet.cc/2022/02/03/fuzzing-wordpress-plugins.html
 
