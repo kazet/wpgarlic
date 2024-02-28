@@ -6,10 +6,5 @@ for file in glob.glob("/var/www/html/**/*.php", recursive=True):
         data = f.read()
     with open(file, "w") as f:
         for i in range(10):
-            data = re.sub(
-                r'(function[^(]*\([^)]*)array (\$[^)]*\))',
-                r'\1\2',
-                data,
-                re.MULTILINE
-            )
+            data = re.sub(r"(function[^(]*\([^)]*)array (\$[^)]*\))", r"\1\2", data, re.MULTILINE)
         f.write(data)

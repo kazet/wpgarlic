@@ -20,7 +20,6 @@ class ObjectType(str, enum.Enum):
     theme = "theme"
 
 
-
 def get_dependencies(slug: str, description: str) -> List[str]:
     dependencies = []
     if ("cf7" in slug or "contact-form-7" in description.lower()) and slug != "contact-form-7":
@@ -59,7 +58,6 @@ def fuzz_object(
         enabled_features = enabled_features.split(",")
 
     if slug_or_path.endswith(".zip") and os.path.exists(slug_or_path):
-        object_path = slug_or_path
         slug = get_object_name_from_file(slug_or_path)
         object_info_dict = {
             "version": 0,
@@ -73,11 +71,12 @@ def fuzz_object(
 
         print("Looking for", slug)
         object_info_dict = requests.get(
-            f"https://api.wordpress.org/{object_type.value}s/info/1.2/?action={object_type.value}_information" f"&request[slug]={slug}"
+            f"https://api.wordpress.org/{object_type.value}s/info/1.2/?action={object_type.value}_information"
+            f"&request[slug]={slug}"
         ).json()
         from_file = False
-        if 'active_installs' not in object_info_dict:
-            object_info_dict['active_installs'] = 1
+        if "active_installs" not in object_info_dict:
+            object_info_dict["active_installs"] = 1
 
     if file_or_folder_to_fuzz == "OBJECT_ROOT":
         file_or_folder_to_fuzz = f"/var/www/html/wp-content/{object_type}s/{slug}"
