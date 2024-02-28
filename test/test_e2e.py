@@ -52,7 +52,8 @@ class FuzzerE2ETest(unittest.TestCase):
         output_path = tempfile.mkdtemp()
         subprocess.call(
             [
-                "./bin/fuzz_plugin",
+                "./bin/fuzz_object",
+                "plugin",
                 plugin,
                 "--skip-fuzzing-second-time-without-dependencies",
                 "--enabled-features",
@@ -76,7 +77,8 @@ class FuzzerE2ETest(unittest.TestCase):
         output_path = tempfile.mkdtemp()
         subprocess.call(
             [
-                "./bin/fuzz_plugin",
+                "./bin/fuzz_object",
+                "plugin",
                 plugin,
                 "--skip-fuzzing-second-time-without-dependencies",
                 "--enabled-features",
@@ -100,7 +102,8 @@ class FuzzerE2ETest(unittest.TestCase):
         output_path = tempfile.mkdtemp()
         subprocess.call(
             [
-                "./bin/fuzz_plugin",
+                "./bin/fuzz_object",
+                "plugin",
                 plugin,
                 "--skip-fuzzing-second-time-without-dependencies",
                 "--enabled-features",
@@ -123,7 +126,8 @@ class FuzzerE2ETest(unittest.TestCase):
         output_path = tempfile.mkdtemp()
         subprocess.call(
             [
-                "./bin/fuzz_plugin",
+                "./bin/fuzz_object",
+                "plugin",
                 plugin,
                 "--skip-fuzzing-second-time-without-dependencies",
                 "--enabled-features",
@@ -145,7 +149,8 @@ class FuzzerE2ETest(unittest.TestCase):
         output_path = tempfile.mkdtemp()
         subprocess.call(
             [
-                "./bin/fuzz_plugin",
+                "./bin/fuzz_object",
+                "plugin",
                 plugin,
                 "--skip-fuzzing-second-time-without-dependencies",
                 "--enabled-features",
@@ -168,7 +173,8 @@ class FuzzerE2ETest(unittest.TestCase):
         output_path = tempfile.mkdtemp()
         subprocess.call(
             [
-                "./bin/fuzz_plugin",
+                "./bin/fuzz_object",
+                "plugin",
                 "site-reviews",
                 "--skip-fuzzing-second-time-without-dependencies",
                 "--version",
@@ -368,7 +374,8 @@ class FuzzerE2ETest(unittest.TestCase):
         output_path = tempfile.mkdtemp()
         subprocess.call(
             [
-                "./bin/fuzz_plugin",
+                "./bin/fuzz_object",
+                "plugin",
                 "social-networks-auto-poster-facebook-twitter-g",
                 "--skip-fuzzing-second-time-without-dependencies",
                 "--revision",
@@ -395,7 +402,8 @@ class FuzzerE2ETest(unittest.TestCase):
         output_path = tempfile.mkdtemp()
         subprocess.call(
             [
-                "./bin/fuzz_plugin",
+                "./bin/fuzz_object",
+                "plugin",
                 "filebird",
                 "--skip-fuzzing-second-time-without-dependencies",
                 "--enabled-features",
@@ -439,7 +447,8 @@ class FuzzerE2ETest(unittest.TestCase):
         output_path = tempfile.mkdtemp()
         subprocess.call(
             [
-                "./bin/fuzz_plugin",
+                "./bin/fuzz_object",
+                "plugin",
                 "user-private-files",
                 "--enabled-features actions,pages_not_logged_in",
                 "--actions-to-fuzz",
@@ -452,7 +461,8 @@ class FuzzerE2ETest(unittest.TestCase):
         )
         subprocess.call(
             [
-                "./bin/fuzz_plugin",
+                "./bin/fuzz_object",
+                "plugin",
                 "user-private-files",
                 "--enabled-features actions,pages_not_logged_in",
                 "--actions-to-fuzz",
@@ -472,7 +482,8 @@ class FuzzerE2ETest(unittest.TestCase):
         output_path = tempfile.mkdtemp()
         subprocess.call(
             [
-                "./bin/fuzz_plugin",
+                "./bin/fuzz_object",
+                "plugin",
                 "wp-compress-image-optimizer",
                 "--enabled-features",
                 "files",
@@ -491,7 +502,8 @@ class FuzzerE2ETest(unittest.TestCase):
         output_path = tempfile.mkdtemp()
         subprocess.call(
             [
-                "./bin/fuzz_plugin",
+                "./bin/fuzz_object",
+                "plugin",
                 "backup-backup",
                 "--version",
                 "1.3.7",
@@ -511,7 +523,8 @@ class FuzzerE2ETest(unittest.TestCase):
         output_path = tempfile.mkdtemp()
         subprocess.call(
             [
-                "./bin/fuzz_plugin",
+                "./bin/fuzz_object",
+                "plugin",
                 "ai-assistant-by-10web",
                 "--enabled-features",
                 "actions",
@@ -524,3 +537,78 @@ class FuzzerE2ETest(unittest.TestCase):
             ]
         )
         self._assert_any_of_expected_strings_in_output(output_path, ["__FILE_EXISTS_OF_GARLIC_DETECTED__"])
+
+    @retry()
+    def test_CVE_2023_4281(self):
+        # Test that the fuzzer would detect IP spoofing in aryo-activity-log
+        # https://wpscan.com/vulnerability/f5ea6c8a-6b07-4263-a1be-dd033f078d49/
+        expected_strings = ["__GARLIC_SPOOFABLE_IP_HEADER__"]
+        output_path = tempfile.mkdtemp()
+        subprocess.call(
+            [
+                "./bin/fuzz_object",
+                "plugin",
+                "aryo-activity-log",
+                "--enabled-features",
+                "pages_not_logged_in",
+                "--skip-fuzzing-second-time-without-dependencies",
+                "--version",
+                "2.8.7",
+                "--output-path",
+                output_path,
+            ]
+        )
+        self._assert_any_of_expected_strings_in_output(output_path, expected_strings)
+
+    @retry()
+    def test_CVE_2024_0835(self):
+        # Test that the fuzzer would detect arbitrary transient update in royal-elementor-kit theme
+        # https://www.wordfence.com/threat-intel/vulnerabilities/wordpress-themes/royal-elementor-kit/royal-elementor-kit-10116-missing-authorization-to-arbitrary-transient-update
+        expected_strings = [
+            "Call: update_option arguments={'name': '_transient_GARLIC",
+            "Call: update_option arguments={'name': '_transient_http://GARLICGARLICGARLIC",
+            "Call: update_option arguments={'name': '_transient_legitimateGARLIC",
+            "Call: update_option arguments={'name': '_transient_invalidfolderGARLIC",
+            "Call: update_option arguments={'name': '_transient_legitimate.emailGARLIC",
+        ]
+        output_path = tempfile.mkdtemp()
+        subprocess.call(
+            [
+                "./bin/fuzz_object",
+                "theme",
+                "royal-elementor-kit",
+                "--enabled-features",
+                "actions",
+                "--skip-fuzzing-second-time-without-dependencies",
+                "--version",
+                "1.0.116",
+                "--output-path",
+                output_path,
+            ]
+        )
+        self._assert_any_of_expected_strings_in_output(output_path, expected_strings)
+
+    @retry()
+    def test_CVE_2024_1510(self):
+        # Test that the fuzzer would detect shortcode contributor+ stored xss in shortcodes-ultimate
+        # https://www.wordfence.com/threat-intel/vulnerabilities/id/ee03d780-076b-4501-a353-376198a4bd7b
+        expected_strings = [
+            '<span class="su-tooltip-title"></GARLIC\'"`></span>',
+        ]
+        output_path = tempfile.mkdtemp()
+        subprocess.call(
+            [
+                "./bin/fuzz_object",
+                "plugin",
+                "shortcodes-ultimate",
+                "--version",
+                "7.0.2",
+                "--enabled-features",
+                "shortcodes",
+                "--shortcodes-to-fuzz",
+                "su_tooltip",
+                "--output-path",
+                output_path,
+            ]
+        )
+        self._assert_any_of_expected_strings_in_output(output_path, expected_strings)

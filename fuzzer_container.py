@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import tempfile
 import time
@@ -9,7 +10,7 @@ from zipfile import ZipFile
 from nonces_storage import get_valid_nonces_for_plugin
 
 
-def _run_in_container(cmd: typing.List[str]) -> None:
+def run_in_container(cmd: typing.List[str]) -> None:
     subprocess.call(
         [
             "docker",
@@ -23,7 +24,7 @@ def _run_in_container(cmd: typing.List[str]) -> None:
 
 
 def _run_in_container_wp_cli(cmd: typing.List[str]) -> None:
-    _run_in_container(
+    run_in_container(
         [
             "/fuzzer/nodebug.sh",
             "php.orig",
@@ -37,7 +38,9 @@ def _run_in_container_wp_cli(cmd: typing.List[str]) -> None:
 def _copy_plugin_into_container(file_path: str) -> str:
     file_name = basename(file_path)
     new_file_path = f"/fuzzer/plugin_{file_name}"
-    subprocess.call(["docker", "cp", file_path, f"wordpress1:{new_file_path}"])
+    subprocess.call(
+        ["docker", "cp", file_path, f"{os.path.basename(os.path.dirname(__file__))}-wordpress1-1:{new_file_path}"]
+    )
     return new_file_path
 
 
@@ -47,7 +50,9 @@ def copy_nonces_into_container(plugin_name: str) -> None:
         f.write("\n".join(nonces).encode("utf-8"))
         f.flush()
         new_file_path = "/fuzzer/valid_nonces.txt"
-        subprocess.call(["docker", "cp", f.name, f"wordpress1:{new_file_path}"])
+        subprocess.call(
+            ["docker", "cp", f.name, f"{os.path.basename(os.path.dirname(__file__))}-wordpress1-1:{new_file_path}"]
+        )
 
 
 def run_in_container_and_get_output(cmd: typing.List[str]) -> bytes:
@@ -63,7 +68,7 @@ def run_in_container_and_get_output(cmd: typing.List[str]) -> bytes:
     )
 
 
-def get_plugin_name_from_file(file_path: str) -> str:
+def get_object_name_from_file(file_path: str) -> str:
     with ZipFile(file_path) as zip_file:
         for listed in zip_file.namelist():
             if listed[-1] != "/":
@@ -74,6 +79,21 @@ def get_plugin_name_from_file(file_path: str) -> str:
 
 def install_dependency(dependency: str) -> None:
     install_plugin_from_slug(dependency)
+
+
+def install_theme_from_slug(slug: str, version: str = None):
+    if version:
+        additional_install_options = ["--version=" + version]
+    else:
+        additional_install_options = []
+    _run_in_container_wp_cli(
+        [
+            "theme",
+            "install",
+            slug,
+        ]
+        + additional_install_options
+    )
 
 
 def install_plugin_from_slug(slug: str, version: str = None):
@@ -106,8 +126,18 @@ def activate_plugin(slug: str) -> None:
     )
 
 
+def activate_theme(slug: str) -> None:
+    _run_in_container_wp_cli(
+        [
+            "theme",
+            "activate",
+            slug,
+        ]
+    )
+
+
 def set_webroot_ownership() -> None:
-    _run_in_container(
+    run_in_container(
         [
             "chown",
             "-R",
@@ -122,15 +152,15 @@ def patch_wordpress(reverse: bool = False) -> None:
     if reverse:
         additional_parameters = ["--reverse"]
 
-    _run_in_container(["/fuzzer/patch_wordpress.sh"] + additional_parameters)
+    run_in_container(["/fuzzer/patch_wordpress.sh"] + additional_parameters)
 
 
-def patch_plugins(reverse: bool = False) -> None:
+def patch_plugins_themes(reverse: bool = False) -> None:
     additional_parameters = []
     if reverse:
         additional_parameters = ["--reverse"]
 
-    _run_in_container(["/fuzzer/patch_plugins.sh"] + additional_parameters)
+    run_in_container(["/fuzzer/patch_plugins_themes.sh"] + additional_parameters)
 
 
 def get_container_id() -> bytes:
@@ -148,24 +178,26 @@ def get_container_id() -> bytes:
 def disconnect_network(container_id: bytes) -> int:
     networks = subprocess.check_output(["docker", "network", "ls", "--format", "{{.Name}}"]).decode("utf-8")
 
-    network_name = "wpgarlic_network2"
+    network_name = f"{os.path.basename(os.path.dirname(__file__))}_network2"
 
     if network_name not in networks.split():
         raise Exception(
-            f"Network {network_name} not found. Make sure the folder name " "where the tool is stored is `wpgarlic`"
+            f"Network {network_name} not found. Make sure the folder name "
+            "where the tool is stored is `wpgarlic`"
+            f"Network {network_name} not found."
         )
 
     return subprocess.call(["docker", "network", "disconnect", network_name, container_id])
 
 
 def disconnect_dns() -> None:
-    _run_in_container(["/fuzzer/disconnect_dns.sh"])
+    run_in_container(["/fuzzer/disconnect_dns.sh"])
 
 
 def visit_admin_homepage() -> None:
     # This is to execute plugin hooks in case it needs to do something
     # on the first admin visit
-    _run_in_container(
+    run_in_container(
         [
             "/fuzzer/just_visit_admin_homepage.sh",
         ]
@@ -208,23 +240,23 @@ def reinitialize_containers():
             "-d",
         ]
     )
-    _run_in_container(["/wait-for-it/wait-for-it.sh", "-h", "db1", "-p", "3306", "-t", "0"])
+    run_in_container(["/wait-for-it/wait-for-it.sh", "-h", "db1", "-p", "3306", "-t", "0"])
     time.sleep(2)
-    _run_in_container(["chown", "-R", "www-data:www-data", "/var/www/html"])
-    _run_in_container(["/fuzzer/create_findable_files.sh"])
-    _run_in_container(
+    run_in_container(["chown", "-R", "www-data:www-data", "/var/www/html"])
+    run_in_container(["/fuzzer/create_findable_files.sh"])
+    run_in_container(
         [
             "bash",
             "-c",
             "mysql --host=db1 -u wordpress --password=wordpress wordpress < /fuzzer/dump.sql",
         ]
     )
-    _run_in_container(["php.orig", "/wp-cli.phar", "--allow-root", "core", "update"])
-    _run_in_container(["php.orig", "/wp-cli.phar", "--allow-root", "core", "update-db"])
+    run_in_container(["php.orig", "/wp-cli.phar", "--allow-root", "core", "update"])
+    run_in_container(["php.orig", "/wp-cli.phar", "--allow-root", "core", "update-db"])
 
 
 def install_plugin_from_svn(slug: str, revision: str):
-    _run_in_container(
+    run_in_container(
         [
             "svn",
             "co",
@@ -233,9 +265,9 @@ def install_plugin_from_svn(slug: str, revision: str):
             revision,
         ]
     )
-    _run_in_container(["mv", slug, slug + ".tmp"])
-    _run_in_container(["mv", slug + ".tmp/trunk", slug])
-    _run_in_container(
+    run_in_container(["mv", slug, slug + ".tmp"])
+    run_in_container(["mv", slug + ".tmp/trunk", slug])
+    run_in_container(
         [
             "zip",
             "-r",
@@ -243,7 +275,7 @@ def install_plugin_from_svn(slug: str, revision: str):
             slug,
         ]
     )
-    _run_in_container(
+    run_in_container(
         [
             "/fuzzer/nodebug.sh",
             "php.orig",
@@ -264,6 +296,20 @@ def fuzz_file_or_folder(payload_id: str, path: str):
                 "/fuzzer/fuzz/fuzz_file_or_folder.py",
                 payload_id,
                 path,
+            ]
+        )
+    )
+
+
+def fuzz_shortcodes(payload_id: str, shortcodes_to_fuzz: str, plugin_slug: str):
+    return json.loads(
+        run_in_container_and_get_output(
+            [
+                "python3",
+                "/fuzzer/fuzz/fuzz_shortcodes.py",
+                payload_id,
+                shortcodes_to_fuzz,
+                plugin_slug,
             ]
         )
     )
@@ -401,7 +447,7 @@ def find_payloads_in_files():
 
 
 def find_payloads_in_admin():
-    _run_in_container(["/fuzzer/download_admin.sh"])
+    run_in_container(["/fuzzer/download_admin.sh"])
     output = _grep_garlic_in_path("/var/www/html/127.0.0.1:8001")
 
     command_results = []
@@ -421,7 +467,7 @@ def find_payloads_in_admin():
 
 
 def find_payloads_in_pages():
-    _run_in_container(["/fuzzer/download_pages.sh"])
+    run_in_container(["/fuzzer/download_pages.sh"])
     output = _grep_garlic_in_path("/var/www/html/pages")
 
     command_results = []

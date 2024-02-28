@@ -1,9 +1,15 @@
 import re
 import subprocess
+import typing
 import unittest
 
 import crash_detector
-from fuzzer_container import reinitialize_containers, run_in_container_and_get_output
+from fuzzer_container import (
+    fuzz_file_or_folder,
+    reinitialize_containers,
+    run_in_container,
+    run_in_container_and_get_output,
+)
 
 
 class CrashDetectorTest(unittest.TestCase):
@@ -16,8 +22,9 @@ class CrashDetectorTest(unittest.TestCase):
         subprocess.call(["docker", "compose", "stop"])
 
     @staticmethod
-    def assertAnyMatcherWouldDetect(output: bytes):
-        output = output.decode("utf-8")
+    def assertAnyMatcherWouldDetect(output: typing.Union[bytes, str]):
+        if isinstance(output, bytes):
+            output = output.decode("utf-8")
         for matcher in crash_detector.get_matchers(in_admin_or_profile=False):
             match = re.search(matcher, output)
             if match:
@@ -83,4 +90,12 @@ class CrashDetectorTest(unittest.TestCase):
                 'php -r \'include("/fuzzer/magic_payloads.php"); @file_get_contents("GARLIC");\' 2>&1',
             ]
         )
+        self.assertAnyMatcherWouldDetect(output)
+
+    def test_srand(self):
+        run_in_container(["cp", "/fuzzer/test/srand.php", "/var/www/html"])
+        run_in_container(["/fuzzer/patch_plugins_themes.sh"])
+        commands = fuzz_file_or_folder("0", "/var/www/html/srand.php")
+        run_in_container(["/fuzzer/patch_plugins_themes.sh", "--reverse"])
+        output = commands[0]["stdout"]
         self.assertAnyMatcherWouldDetect(output)

@@ -39,11 +39,18 @@ function get_rest_routes {
         | grep REST_ROUTE: | cut -d" " -f2- | tr -d \\r
 }
 
+function get_shortcodes {
+    exec \
+        php.orig /fuzzer/get_fuzzable_entrypoints/get_shortcodes_to_fuzz.php \
+        | grep SHORTCODE: | cut -d" " -f2- | tr -d \\r
+}
+
 rebuild_and_restart
 
 get_ajax_actions > docker_image/blocklists/actions/common
 get_menu_actions > docker_image/blocklists/menu/common
 get_rest_routes > docker_image/blocklists/rest/common
+get_shortcodes > docker_image/blocklists/shortcodes/common
 
 for plugin in contact-form-7 elementor the-events-calendar woocommerce; do
     rebuild_and_restart
@@ -57,4 +64,5 @@ for plugin in contact-form-7 elementor the-events-calendar woocommerce; do
     get_ajax_actions > docker_image/blocklists/actions/$plugin
     get_menu_actions > docker_image/blocklists/menu/$plugin
     get_rest_routes > docker_image/blocklists/rest/$plugin
+    get_shortcodes > docker_image/blocklists/shortcodes/$plugin
 done

@@ -6,4 +6,4 @@ cd "$(dirname "$0")/.."
 
 . ./bin/create_and_enter_venv
 
-python fuzz_plugin.py $@
+python fuzz_object.py $@
