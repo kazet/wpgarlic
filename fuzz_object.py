@@ -1,8 +1,10 @@
 import binascii
+import bs4
 import enum
 import json
 import os
 import random
+import requests
 import string
 import traceback
 from typing import List, Optional
@@ -76,7 +78,8 @@ def fuzz_object(
         ).json()
         from_file = False
         if "active_installs" not in object_info_dict:
-            object_info_dict["active_installs"] = 1
+            soup = bs4.BeautifulSoup(requests.get(f'https://wordpress.org/{object_type.value}s/{slug}/').content)
+            object_info_dict["active_installs"] = soup.select("p.active_installs > strong")[0].text.replace('+', '').replace(',', '')
 
     if file_or_folder_to_fuzz == "OBJECT_ROOT":
         file_or_folder_to_fuzz = f"/var/www/html/wp-content/{object_type}s/{slug}"
