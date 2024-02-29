@@ -10,6 +10,7 @@ if [ "$1" == '--reverse' ]; then
     cp /var/www/html/wp-includes/pluggable.php.orig /var/www/html/wp-includes/pluggable.php
     cp /var/www/html/wp-includes/user.php.orig /var/www/html/wp-includes/user.php
     cp /var/www/html/wp-includes/class-wpdb.php.orig /var/www/html/wp-includes/class-wpdb.php
+    cp /var/www/html/wp-includes/shortcodes.php.orig /var/www/html/wp-includes/shortcodes.php
     cp /var/www/html/wp-admin/includes/class-plugin-upgrader.php.orig /var/www/html/wp-admin/includes/class-plugin-upgrader.php
 else
     cp /var/www/html/wp-includes/formatting.php /var/www/html/wp-includes/formatting.php.orig
@@ -21,6 +22,7 @@ else
     cp /var/www/html/wp-includes/pluggable.php /var/www/html/wp-includes/pluggable.php.orig
     cp /var/www/html/wp-includes/user.php /var/www/html/wp-includes/user.php.orig
     cp /var/www/html/wp-includes/class-wpdb.php /var/www/html/wp-includes/class-wpdb.php.orig
+    cp /var/www/html/wp-includes/shortcodes.php /var/www/html/wp-includes/shortcodes.php.orig
     cp /var/www/html/wp-admin/includes/class-plugin-upgrader.php /var/www/html/wp-admin/includes/class-plugin-upgrader.php.orig
 
     patch /var/www/html/wp-settings.php /fuzzer/wordpress_patches/wp-settings.php.patch
@@ -31,6 +33,8 @@ else
     # returned unescaped or strings were treated as serialized - and led to false positives.
     patch /var/www/html/wp-includes/formatting.php /fuzzer/wordpress_patches/formatting.php.patch
     patch /var/www/html/wp-includes/functions.php /fuzzer/wordpress_patches/functions.php.patch
+
+    sed -i 's/$atts = (array) $atts;//g' /var/www/html/wp-includes/shortcodes.php
 
     sed -i '/^function update_option(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "update_option", "data" => array("name" => $option, "value" => print_r($value, true)))) . "__ENDGARLIC__\\n");' \
         /var/www/html/wp-includes/option.php
@@ -56,7 +60,7 @@ else
     # let's treat is as correct nonce.
     sed -i '/^\s*function wp_create_nonce(/a return "__GARLIC_NONCE__" . $action . "__ENDNONCEGARLIC__"; ' \
         /var/www/html/wp-includes/pluggable.php
-    sed -i '/^\s*function wp_verify_nonce(/a global $_garlic_found_nonces; if ($action == "wp_rest" || strstr($action, "GARLIC") > 0 || in_array($action, $_garlic_found_nonces)) { return 1; }' \
+    sed -i '/^\s*function wp_verify_nonce(/a global $_garlic_found_nonces; if (!strcmp($action, "wp_rest") || strstr($action, "GARLIC") > 0 || _unpatched_str_in_array($action, $_garlic_found_nonces)) { return 1; }' \
         /var/www/html/wp-includes/pluggable.php
     sed -i '/^function wp_insert_user(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "wp_insert_user", "data" => $userdata)) . "__ENDGARLIC__\\n");' \
         /var/www/html/wp-includes/user.php

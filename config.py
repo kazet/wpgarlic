@@ -1,6 +1,7 @@
 DEFAULT_ENABLED_FEATURES = [
     "actions",
     "actions_admin",
+    "shortcodes",
     "menu_subscriber",
     "menu_admin",
     "pages_subscriber",

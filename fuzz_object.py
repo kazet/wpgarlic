@@ -1,4 +1,5 @@
 import binascii
+import enum
 import json
 import os
 import random
@@ -6,12 +7,18 @@ import string
 import traceback
 from typing import List, Optional
 
+import bs4
 import requests
 import typer
 
 import config
 from fuzzer_container import *
 from nonces_storage import collect_nonces
+
+
+class ObjectType(str, enum.Enum):
+    plugin = "plugin"
+    theme = "theme"
 
 
 def get_dependencies(slug: str, description: str) -> List[str]:
@@ -32,17 +39,19 @@ def get_dependencies(slug: str, description: str) -> List[str]:
     return dependencies
 
 
-def fuzz_plugin(
+def fuzz_object(
+    object_type: ObjectType,
     slug_or_path: str,
     version: Optional[str] = None,
     revision: Optional[str] = None,
     enabled_features: Optional[str] = None,
     skip_fuzzing_second_time_without_dependencies: bool = False,
     actions_to_fuzz: str = "ALL",
+    shortcodes_to_fuzz: str = "ALL",
     rest_routes_to_fuzz: str = "ALL",
     menu_actions_to_fuzz: str = "ALL",
-    file_or_folder_to_fuzz: str = "PLUGIN_ROOT",
-    output_path: str = "data/plugin_fuzz_results",
+    file_or_folder_to_fuzz: str = "OBJECT_ROOT",
+    output_path: str = "data/object_fuzz_results",
 ):
     if not enabled_features:
         enabled_features = config.DEFAULT_ENABLED_FEATURES
@@ -50,9 +59,8 @@ def fuzz_plugin(
         enabled_features = enabled_features.split(",")
 
     if slug_or_path.endswith(".zip") and os.path.exists(slug_or_path):
-        plugin_path = slug_or_path
-        slug = get_plugin_name_from_file(slug_or_path)
-        plugin_info_dict = {
+        slug = get_object_name_from_file(slug_or_path)
+        object_info_dict = {
             "version": 0,
             "active_installs": 0,
             "sections": {"description": ""},
@@ -63,18 +71,24 @@ def fuzz_plugin(
         assert all([letter in string.ascii_letters + string.digits + "-_" for letter in slug])
 
         print("Looking for", slug)
-        plugin_info_dict = requests.get(
-            f"https://api.wordpress.org/plugins/info/1.2/?action=plugin_information" f"&request[slug]={slug}"
+        object_info_dict = requests.get(
+            f"https://api.wordpress.org/{object_type.value}s/info/1.2/?action={object_type.value}_information"
+            f"&request[slug]={slug}"
         ).json()
         from_file = False
+        if "active_installs" not in object_info_dict:
+            soup = bs4.BeautifulSoup(requests.get(f"https://wordpress.org/{object_type.value}s/{slug}/").content)
+            object_info_dict["active_installs"] = (
+                soup.select("p.active_installs > strong")[0].text.replace("+", "").replace(",", "")
+            )
 
-    if file_or_folder_to_fuzz == "PLUGIN_ROOT":
-        file_or_folder_to_fuzz = f"/var/www/html/wp-content/plugins/{slug}"
+    if file_or_folder_to_fuzz == "OBJECT_ROOT":
+        file_or_folder_to_fuzz = f"/var/www/html/wp-content/{object_type}s/{slug}"
 
     if version is None:
-        version = plugin_info_dict["version"]
-    active_installs = plugin_info_dict["active_installs"]
-    description = plugin_info_dict["sections"]["description"]
+        version = object_info_dict["version"]
+    active_installs = object_info_dict["active_installs"]
+    description = object_info_dict["sections"]["description"]
 
     dependencies = get_dependencies(slug, description)
 
@@ -89,29 +103,44 @@ def fuzz_plugin(
                     visit_admin_homepage()
 
             if from_file:
+                if object_type != ObjectType.plugin:
+                    raise NotImplementedError()
+
                 install_plugin_from_file(plugin_path)
                 activation_problem = None
             elif revision:
+                if object_type != ObjectType.plugin:
+                    raise NotImplementedError()
+
                 install_plugin_from_svn(slug, revision)
             else:
-                install_plugin_from_slug(slug, version)
-
+                if object_type == ObjectType.plugin:
+                    install_plugin_from_slug(slug, version)
+                elif object_type == ObjectType.theme:
+                    install_theme_from_slug(slug, version)
+                else:
+                    raise NotImplementedError()
             try:
-                activate_plugin(slug)
+                if object_type == ObjectType.plugin:
+                    activate_plugin(slug)
+                elif object_type == ObjectType.theme:
+                    activate_theme(slug)
+                else:
+                    raise NotImplementedError()
                 activation_problem = None
             except Exception as e:
                 activation_problem = repr(e)
 
             set_webroot_ownership()
 
-            # This is to execute plugin hooks in case it needs to do something
+            # This is to execute hooks in case it needs to do something
             # on first admin visit. Let's do this multiple times for sure.
             for i in range(3):
                 visit_admin_homepage()
 
             copy_nonces_into_container(slug)
             patch_wordpress()
-            patch_plugins()
+            patch_plugins_themes()
 
             container_id = get_container_id()
 
@@ -133,6 +162,7 @@ def fuzz_plugin(
                     "pages_not_logged_in",
                     "rest_routes",
                     "rest_routes_admin",
+                    "shortcodes",
                 }
                 & set(enabled_features)
             )
@@ -160,6 +190,8 @@ def fuzz_plugin(
                         command_results += fuzz_pages("RANDOM", 2)
                     elif task == "pages_not_logged_in":
                         command_results += fuzz_pages("RANDOM", 0)
+                    elif task == "shortcodes":
+                        command_results += fuzz_shortcodes("RANDOM", shortcodes_to_fuzz, slug)
                     else:
                         assert False
                 except Exception:
@@ -167,13 +199,13 @@ def fuzz_plugin(
                     continue
 
             # After fuzzing (when we're just looking for results), we unpatch
-            # plugins because we stop using the module that e.g. defines
+            # plugins/themes because we stop using the module that e.g. defines
             # __garlic_is_array.
-            patch_wordpress(True)
+            patch_plugins_themes(True)
 
             # We also need WordPress to not emit any logs that e.g. update_option
             # got called, because this would pollute output.
-            patch_plugins(True)
+            patch_wordpress(True)
 
             if "find_in_files_after_fuzzing" in enabled_features:
                 command_results_but_not_for_nonces += find_payloads_in_files()
@@ -212,4 +244,4 @@ def fuzz_plugin(
 
 
 if __name__ == "__main__":
-    typer.run(fuzz_plugin)
+    typer.run(fuzz_object)

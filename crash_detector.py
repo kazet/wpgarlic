@@ -11,7 +11,8 @@ def get_matchers(
         re.compile("location=.{0,10}GARLIC", flags),
         re.compile("location.href=.{0,10}GARLIC", flags),
         re.compile("Unable to prepare statement", flags),
-        re.compile("__GARLIC_SPOOFABLE_IP_HEADER__", flags),
+        # This is a significant source of FPs, but feel free to enable it
+        # re.compile("__GARLIC_SPOOFABLE_IP_HEADER__", flags),
         re.compile("__FWRITE_OF_GARLIC_DETECTED__", flags),
         re.compile("__FILE_EXISTS_OF_GARLIC_DETECTED__", flags),
         re.compile("fopen\\(.{0,256}GARLIC", flags),

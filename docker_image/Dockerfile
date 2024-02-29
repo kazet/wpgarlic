@@ -66,13 +66,15 @@ COPY get_fuzzable_entrypoints /fuzzer/get_fuzzable_entrypoints
 COPY fuzz /fuzzer/fuzz
 COPY execute /fuzzer/execute
 
+COPY strip_php_array_annotations.py /fuzzer/
+
 COPY create_findable_files.sh /fuzzer/create_findable_files.sh
 COPY disconnect_dns.sh /fuzzer/disconnect_dns.sh
 COPY download_admin.sh /fuzzer/download_admin.sh
 COPY download_pages.sh /fuzzer/download_pages.sh
 COPY just_visit_admin_homepage.sh /fuzzer/just_visit_admin_homepage.sh
 COPY nodebug.sh /fuzzer/nodebug.sh
-COPY patch_plugins.sh /fuzzer/patch_plugins.sh
+COPY patch_plugins_themes.sh /fuzzer/patch_plugins_themes.sh
 COPY patch_wordpress.sh /fuzzer/patch_wordpress.sh
 
 COPY test /fuzzer/test

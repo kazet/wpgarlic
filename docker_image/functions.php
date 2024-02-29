@@ -1,4 +1,39 @@
 <?php
+
+if (!function_exists("_unpatched_str_in_array")) {
+    function _unpatched_str_in_array($needle, $haystack) {
+        foreach ($haystack as $item) {
+            if (!strcmp($needle, $item))
+                return true;
+        }
+        return false;
+    }
+}
+
+
+if (!function_exists("__garlic_array_key_exists")) {
+    function __garlic_array_key_exists($key, $array) {
+        if ($array instanceof MagicArray) {
+            return isset($array[$key]);
+        } else {
+            return array_key_exists($key, $array);
+        }
+    }
+}
+
+if (!function_exists("__garlic_srand")) {
+    function __garlic_srand() {
+        echo "__GARLIC_CALL__ srand() __ENDGARLIC__";
+    }
+}
+
+if (!function_exists("__garlic_trigger_error")) {
+    function __garlic_trigger_error($msg, $level = E_USER_NOTICE) {
+        # So that we skip fatal errors
+        echo("Error: " . $msg);
+    }
+}
+
 if (!function_exists("__garlic_getallheaders")) {
     function __garlic_getallheaders() {
         return new MagicArrayOrObject('getallheaders output', false);
