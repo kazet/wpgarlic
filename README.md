@@ -103,14 +103,14 @@ and most of the subject. If you want to be sure, look at the plugin source.
 The first run of fuzzing or of the tests may take about an hour, because
 we need to build the Docker image with instrumented PHP and WordPress.
 
-### Fuzzing a theme by name
-```
-./bin/fuzz_object theme PLUGIN_SLUG
-```
-
 ### Fuzzing a plugin by name
 ```
 ./bin/fuzz_object plugin PLUGIN_SLUG
+```
+
+### Fuzzing a theme by name
+```
+./bin/fuzz_object theme THEME_SLUG
 ```
 
 ### Fuzzing a plugin from file
