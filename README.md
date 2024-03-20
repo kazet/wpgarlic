@@ -22,7 +22,7 @@ For obvious reasons, the examples will contain only vulnerabilities that have al
 Let's assume you are fuzzing `responsive-vector-maps` in version 6.4.0:
 
 ```
-./bin/fuzz_plugin responsive-vector-maps --version 6.4.0
+./bin/fuzz_object plugin responsive-vector-maps --version 6.4.0
 ```
 
 (to fuzz the latest version, just skip `--version`).
@@ -30,7 +30,7 @@ Let's assume you are fuzzing `responsive-vector-maps` in version 6.4.0:
 After the fuzzing finishes (which would take 10-30 minutes for this plugin) you can call:
 
 ```
-./bin/print_findings data/plugin_fuzz_results/
+./bin/print_findings data/object_fuzz_results/
 ```
 
 You will see, among others:
@@ -55,7 +55,7 @@ The data in yellow are what payloads were injected into what variables.
 Let's assume you are fuzzing `page-builder-add` in version 1.4.9.4:
 
 ```
-./bin/fuzz_plugin page-builder-add --version 1.4.9.4
+./bin/fuzz_object plugin page-builder-add --version 1.4.9.4
 ```
 
 After printing the results, you will see known payload echoed back:
@@ -68,7 +68,7 @@ In this case, it is: [CVE-2021-25067](https://wpscan.com/vulnerability/365007f0-
 
 ### Option update leading to stored XSS
 ```
-./bin/fuzz_plugin duplicate-page-or-post --version 1.4.6
+./bin/fuzz_object plugin duplicate-page-or-post --version 1.4.6
 ```
 
 After printing the results, you will see `update_option` being called:
@@ -105,20 +105,25 @@ we need to build the Docker image with instrumented PHP and WordPress.
 
 ### Fuzzing a plugin by name
 ```
-./bin/fuzz_plugin PLUGIN_SLUG
+./bin/fuzz_object plugin PLUGIN_SLUG
+```
+
+### Fuzzing a theme by name
+```
+./bin/fuzz_object theme THEME_SLUG
 ```
 
 ### Fuzzing a plugin from file
 You can also install a plugin from a local zip file:
 
 ```
-./bin/fuzz_plugin PLUGIN_FILE_NAME.zip
+./bin/fuzz_object plugin PLUGIN_FILE_NAME.zip
 ```
 
 ### Printing findings
 To print what the fuzzer found, use:
 ```
-./bin/print_findings data/plugin_fuzz_results/
+./bin/print_findings data/object_fuzz_results/
 ```
 
 ### Running tests
