@@ -10,6 +10,7 @@ authorized_licenses = [
     "apache 2.0",
     "Apache License 2.0",
     "apache software",
+    "isc license (iscl)",
     "mozilla public license 2.0 (mpl 2.0)",
     "mit",
     "python software foundation",

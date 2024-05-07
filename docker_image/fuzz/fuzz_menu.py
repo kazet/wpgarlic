@@ -40,7 +40,7 @@ for action in actions_to_fuzz:
     sys.stderr.flush()
 
     assert isinstance(user_id, str)
-    if user_id == '1':  # admin
+    if user_id == "1":  # admin
         prefix = "TOP_LEVEL_NAVIGATION_ONLY=1"
     else:  # subscriber may perform POSTs etc.
         prefix = ""
