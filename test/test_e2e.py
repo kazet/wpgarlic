@@ -590,3 +590,25 @@ class FuzzerE2ETest(unittest.TestCase):
             ]
         )
         self._assert_any_of_expected_strings_in_output(output_path, expected_strings)
+
+    @retry()
+    def test_CVE_2023_40000(self):
+        # Test that the fuzzer would detect stored xss in litespeed-cache
+        # https://patchstack.com/articles/xss-vulnerability-in-litespeed-cache-plugin-affecting-4-million-sites/
+        expected_strings = ["Call: update_option arguments={'name': 'litespeed.admin_display.messages', "]
+        output_path = tempfile.mkdtemp()
+        subprocess.call(
+            [
+                "./bin/fuzz_object",
+                "plugin",
+                "litespeed-cache",
+                "--version=5.7",
+                "--enabled-features",
+                "rest_routes",
+                "--rest-routes-to-fuzz",
+                "/litespeed/v1/cdn_status@0",
+                "--output-path",
+                output_path,
+            ]
+        )
+        self._assert_any_of_expected_strings_in_output(output_path, expected_strings)
