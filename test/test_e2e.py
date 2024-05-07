@@ -595,9 +595,7 @@ class FuzzerE2ETest(unittest.TestCase):
     def test_CVE_2023_40000(self):
         # Test that the fuzzer would detect stored xss in litespeed-cache
         # https://patchstack.com/articles/xss-vulnerability-in-litespeed-cache-plugin-affecting-4-million-sites/
-        expected_strings = [
-            "Call: update_option arguments={'name': 'litespeed.admin_display.messages', "
-        ]
+        expected_strings = ["Call: update_option arguments={'name': 'litespeed.admin_display.messages', "]
         output_path = tempfile.mkdtemp()
         subprocess.call(
             [
