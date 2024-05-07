@@ -1,6 +1,7 @@
 admin_page_edit?post_type=e-landing-page
 appearance_page_custom-background
 toplevel_page_elementor
+elementor_page_elementor-settings
 elementor_library_page_edit?post_type=elementor_library&tabs_group=library
 elementor_page_elementor-connect
 elementor_page_elementor-role-manager
@@ -9,7 +10,7 @@ elementor_page_elementor-element-manager
 elementor_page_elementor-tools
 elementor_library_page_e-landing-page
 elementor_page_elementor-system-info
-elementor_library_page_http://127.0.0.1:8001/wp-admin/admin?page=elementor-app&ver=3.19.2#/kit-library
+elementor_library_page_http://127.0.0.1:8001/wp-admin/admin?page=elementor-app&ver=3.21.3#/kit-library
 elementor_page_elementor-getting-started
 elementor_page_go_knowledge_base_site
 elementor_page_e-form-submissions

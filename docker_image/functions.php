@@ -1,5 +1,13 @@
 <?php
 
+define('__GARLIC_PHP_SAPI', "cgi");
+
+if (!function_exists("__garlic_php_sapi_name")) {
+    function __garlic_php_sapi_name() {
+        return "cgi";
+    }
+}
+
 if (!function_exists("_unpatched_str_in_array")) {
     function _unpatched_str_in_array($needle, $haystack) {
         foreach ($haystack as $item) {

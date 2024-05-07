@@ -635,12 +635,15 @@
 /wc/v3/data/currencies@0
 /wc/v3/data/currencies/current@0
 /wc/v3/data/currencies/(?P<currency>[\w-]{3})@0
+/wc/v3/orders/(?P<id>[\d]+)/receipt@0
+/wc/v3/orders/(?P<id>[\d]+)/receipt@1
 /wc-telemetry@0
 /wc-telemetry/tracker@0
 /wccom-site/v3@0
 /wccom-site/v3/installer@0
 /wccom-site/v3/installer/reset@0
 /wccom-site/v3/ssr@0
+/wccom-site/v3/status@0
 /wp-block-editor/v1@0
 /wp-block-editor/v1/url-details@0
 /wp-block-editor/v1/export@0
