@@ -29,6 +29,6 @@ dashboard_page_wc-admin&path=/setup-wizard
 woocommerce_page_wc-reports
 woocommerce_page_wc-settings
 woocommerce_page_wc-status
-woocommerce_page_wc-admin&path=/extensions
 woocommerce_page_wc-addons
+woocommerce_page_wc-admin&path=/extensions
 appearance_page_theme-editor
