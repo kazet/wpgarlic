@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   wordpress_update_blocklists:
     container_name: wordpress_update_blocklists
