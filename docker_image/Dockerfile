@@ -48,7 +48,7 @@ RUN docker-php-ext-enable pcntl
 # assume for now we want to observe bugs of that kind.
 RUN bash -c 'echo "allow_url_include = On" > /usr/local/etc/php/conf.d/allow.ini'
 
-RUN bash -c "cd / && curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar"
+RUN bash -c "cd / && curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && chmod +x wp-cli.phar"
 RUN bash -c "cd / && git clone https://github.com/vishnubob/wait-for-it"
 
 COPY apache_config/000-default.conf /etc/apache2/sites-enabled/

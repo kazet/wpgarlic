@@ -77,7 +77,13 @@ if (!function_exists("__garlic_file_exists")) {
 
 
 if (!function_exists("__garlic_array_merge")) {
-    function __garlic_array_merge($original, ...$arrays) {
+    function __garlic_array_merge(...$arrays) {
+        if (count($arrays) == 0) {
+            return array();
+        }
+
+        $original = array_shift($arrays);
+
         foreach($arrays as $other) {
             if ($other instanceof MagicArray) {
                 return $other;
