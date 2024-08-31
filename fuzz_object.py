@@ -78,21 +78,31 @@ def fuzz_object(
         from_file = False
         if "active_installs" not in object_info_dict:
             soup = bs4.BeautifulSoup(requests.get(f"https://wordpress.org/{object_type.value}s/{slug}/").content)
-            object_info_dict["active_installs"] = (
-                soup.select("p.active_installs > strong")[0]
-                .text.replace("+", "")
-                .replace(",", "")
-                .replace("millions", "million")
-                .replace(" million", "000000")
-            )
+            try:
+                object_info_dict["active_installs"] = (
+                    soup.select("p.active_installs > strong")[0]
+                    .text.replace("+", "")
+                    .replace(",", "")
+                    .replace("millions", "million")
+                    .replace(" million", "000000")
+                )
+            except IndexError:
+                object_info_dict["active_installs"] = 0
 
     if file_or_folder_to_fuzz == "OBJECT_ROOT":
         file_or_folder_to_fuzz = f"/var/www/html/wp-content/{object_type.value}s/{slug}"
 
     if version is None:
-        version = object_info_dict["version"]
+        if "version" in object_info_dict:
+            version = object_info_dict["version"]
+        else:
+            version = None
     active_installs = object_info_dict["active_installs"]
-    description = object_info_dict["sections"]["description"]
+
+    try:
+        description = object_info_dict["sections"]["description"]
+    except KeyError:
+        description = ""
 
     dependencies = get_dependencies(slug, description)
 
