@@ -27,6 +27,7 @@ def get_matchers(
         re.compile("__GARLIC_CALL__ srand\\(\\) __ENDGARLIC__", flags),
         re.compile("function '.{0,30}GARLIC.{0,30}' not found", flags),
         re.compile("SQL syntax.{0,2048}GARLIC", flags),
+        re.compile(":/bin", flags),
         re.compile("<GARLIC", flags),
         # Forgot quotes that allow xss?
         re.compile("\\s[A-Za-z_0-9-]+\\s*=\\s*[^\\s\"']*GARLIC GARLIC", flags),
