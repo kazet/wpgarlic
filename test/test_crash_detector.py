@@ -46,6 +46,10 @@ class CrashDetectorTest(unittest.TestCase):
         output = run_in_container_and_get_output(["php", "-r", "echo 'GARLIC\\\\\\\\\\\\\\\\\\'\\\\\\\\\\\\\\\\\"';"])
         self.assertAnyMatcherWouldDetect(output)
 
+    def test_phpinfo_or_env_is_detected(self):
+        output = run_in_container_and_get_output(["php", "-r", 'phpinfo();'])
+        self.assertAnyMatcherWouldDetect(output)
+
     def test_libxml_crashes_are_detected(self):
         output = run_in_container_and_get_output(["php", "-r", 'simplexml_load_string("BAD XML");'])
         self.assertAnyMatcherWouldDetect(output)
