@@ -44,6 +44,8 @@ else
         /var/www/html/wp-includes/option.php
     sed -i '/^function delete_site_option(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "delete_site_option", "data" => array("name" => $option))) . "__ENDGARLIC__\\n");' \
         /var/www/html/wp-includes/option.php
+    sed -i '/^function do_shortcode(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "do_shortcode", "data" => array("content" => $content))) . "__ENDGARLIC__\\n");' \
+        /var/www/html/wp-includes/shortcodes.php
     sed -i '/^function wp_delete_post(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "wp_delete_post", "data" => array("id" => $postid))) . "__ENDGARLIC__\\n");' \
         /var/www/html/wp-includes/post.php
     sed -i '/^function wp_insert_post(/a fwrite(STDERR,  "__GARLIC_CALL__" . json_encode(array("what" => "wp_insert_post", "data" => $postarr)) . "__ENDGARLIC__\\n");' \
